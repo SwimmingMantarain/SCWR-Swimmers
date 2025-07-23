@@ -1,0 +1,76 @@
+@font-face {
+		font-family: 'Omniface Regular';
+		src: url('/static/font/omniface-demo.otf');
+}
+
+img#header-logo {
+		max-width: 300px;
+		height: min-content;
+		margin: 0;
+}
+
+.card {
+		margin: 0;
+		padding: 0;
+		position: relative;
+		border: none;
+		cursor: cell;
+		user-select: none;
+}
+
+.card-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+		border: 2px solid #4a90b8;
+		border-radius: 15px;
+}
+
+legend {
+		position: absolute;
+		top: 10px;
+		left: 10px;
+		z-index: 10;
+		backdrop-filter: blur(8px);
+		background: rgba(0, 100, 255, 0.25);
+		padding: 6px 8px;
+		border-radius: 10px;
+		font-weight: bold;
+		font-family: 'Omniface Regular', sans-serif;
+		margin: 0;
+		float: left;
+}
+
+legend span#special {
+		display: block;
+		transform: translateY(4px);
+}
+
+legend span#not-special {
+		display: block;
+		transform: translateY(2px);
+}
+
+header {
+		padding: 8px !important;
+		border: none !important;
+		background: #050d15 !important;
+		border-bottom: 2px solid #4a90b8 !important;
+		height: min-content !important;
+}
+
+#content {
+		display: grid;
+		row-gap: 5px;
+		padding-top: 1px;
+}
+
+body {
+		background: #0a1621 !important;
+}
+
+html {
+		scrollbar-width: thin;
+		scrollbar-color: #1a3a52 #0a1621;
+}
