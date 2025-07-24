@@ -3,32 +3,78 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>SCWR Swimmers</title>
-  <link rel="icon" type="image/x-icon" href="/static/img/favicon.png">
-  <script src="https://unpkg.com/htmx.org@2.0.0" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
+  <link rel="icon" href="/static/img/favicon.png">
+  <script
+    src="https://unpkg.com/htmx.org@2.0.0"
+    integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw"
+    crossorigin="anonymous">
+  </script>
   <link rel="stylesheet" href="/static/css/index.css">
   <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
 </head>
 <body>
-				<header>
-						<img id="header-logo" src="/static/img/header-logo.png">
-				</header>
-				<main>
-						<div id="content">
-								<fieldset class="card" hx-get="/athletes" hx-trigger="click" hx-target="#content" hx-swap="innerHTML" hx-push-url="true">
-										<legend><span id="special">Athletes</span></legend>
-										<img class="card-img" src="/static/img/athletes-{{range(1, 5) | random}}.jpg">
-								</fieldset>
-								<fieldset class="card" hx-get="/records" hx-trigger="click" hx-target="#content" hx-swap="innerHTML" hx-push-url="true">
-										<legend><span id="special">Club Records</span></legend>
-										<img class="card-img" src="/static/img/records-{{range(1, 5) | random}}.jpg">
-								</fieldset>
-								<fieldset class="card" hx-get="/meets" hx-trigger="click" hx-target="#content" hx-swap="innerHTML" hx-push-url="true">
-										<legend><span id="not-special">Past, Present & Upcoming Meets</span></legend>
-										<img class="card-img" src="/static/img/meets-{{range(1, 5) | random}}.jpg">
-								</fieldset>
-						</div>
-				</main>
+  <header>
+    <img id="header-logo" src="/static/img/header-logo.png" alt="SCWR Logo">
+  </header>
+  <main>
+    <div id="content">
+      <div
+        class="card"
+        role="button"
+        tabindex="0"
+        hx-get="/athletes"
+        hx-trigger="click"
+        hx-target="#content"
+        hx-swap="innerHTML swap:0.8s"
+        hx-push-url="true">
+        <div class="card-label">
+          <span id="special">Athletes</span>
+        </div>
+        <img
+          class="card-img"
+          src="/static/img/athletes-{{range(1, 5) | random}}.jpg"
+          alt="Athletes">
+      </div>
+
+      <div
+        class="card"
+        role="button"
+        tabindex="0"
+        hx-get="/records"
+        hx-trigger="click"
+        hx-target="#content"
+        hx-swap="innerHTML swap:0.8s"
+        hx-push-url="true">
+        <div class="card-label">
+          <span id="special">Club Records</span>
+        </div>
+        <img
+          class="card-img"
+          src="/static/img/records-{{range(1, 5) | random}}.jpg"
+          alt="Club Records">
+      </div>
+
+      <div
+        class="card"
+        role="button"
+        tabindex="0"
+        hx-get="/meets"
+        hx-trigger="click"
+        hx-target="#content"
+        hx-swap="innerHTML swap:0.8s"
+        hx-push-url="true">
+        <div class="card-label">
+          <span id="not-special">Past, Present &amp; Upcoming Meets</span>
+        </div>
+        <img
+          class="card-img"
+          src="/static/img/meets-{{range(1, 5) | random}}.jpg"
+          alt="Meets">
+      </div>
+    </div>
+  </main>
 </body>
 </html>
+
