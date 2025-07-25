@@ -1,4 +1,25 @@
 {% extends "index.html" %}
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/admin.css">
+{% endblock %}
 {% block content %}
-<h1>Admin</h1>
+<div class="card">
+		<h1>BANANA</h1>
+		<form id="admin-form" hx-post="/admin" hx-on:htmx:after-request="this.reset()">
+				<input type="password" id="password" name="password" placeholder="Input BANANA" required><br><br>
+				<button type="submit">BANANA</button>
+		</form>
+</div>
+<script>
+  document.getElementById('admin-form').addEventListener('submit', function(e) {
+    const passwordInput = document.getElementById('password');
+    const password = passwordInput.value;
+    if (/^banana$/i.test(password)) {
+      e.preventDefault();
+      const audio = new Audio('/static/mp3/BANANA.mp3');
+      audio.play();
+      passwordInput.value = '';
+    } // else, allow form to submit and print password on backend
+  });
+</script>
 {% endblock %}
