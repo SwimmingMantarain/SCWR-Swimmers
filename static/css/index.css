@@ -5,10 +5,15 @@
   src: url('/static/font/omniface-demo.otf');
 }
 
-img#header-logo {
+#header-logo {
   max-width: 300px;
   height: auto;
   margin: 0;
+}
+
+div#logo-wrapper {
+	margin-block-start: 0 !important;
+	cursor: pointer;
 }
 
 .card {

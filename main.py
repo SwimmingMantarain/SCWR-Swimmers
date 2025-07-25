@@ -28,10 +28,14 @@ CREATE TABLE IF NOT EXISTS todos (
 cursor.execute(query)
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
-    rand = random.randint(1, 4)
+async def index(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
+    if hx_request:
+        return templates.TemplateResponse(
+            request=request, name="htmx/index.html"
+        )
+
     return templates.TemplateResponse(
-        request=request, name="index.html", context={"rand": rand}
+        request=request, name="index.html"
     )
 
 @app.get("/athletes", response_class=HTMLResponse)

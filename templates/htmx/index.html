@@ -1,28 +1,4 @@
-<!-- templates/index.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>SCWR Swimmers</title>
-  <link rel="icon" href="/static/img/favicon.png">
-  <script
-    src="https://unpkg.com/htmx.org@2.0.0"
-    integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw"
-    crossorigin="anonymous">
-  </script>
-  <link rel="stylesheet" href="/static/css/index.css">
-  <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
-</head>
-<body>
-  <header>
-    <div id="logo-wrapper" role="button" tabindex="0" hx-get="/" hx-target="#content" hx-swap="innerHTML swap:0.8s" hx-push-url="true">
-      <img id="header-logo" src="/static/img/header-logo.png" alt="SCWR Logo">
-    </div>
-  </header>
-  <main>
-    <div id="content">
-      <div
+<div
         class="card"
         role="button"
         tabindex="0"
@@ -36,7 +12,7 @@
         </div>
         <img
           class="card-img"
-          src="/static/img/athletes-{{range(1, 5) | random}}.jpg"
+          src="/static/img/athletes-{{range(1, 9) | random}}.jpg"
           alt="Athletes">
       </div>
 
@@ -54,7 +30,7 @@
         </div>
         <img
           class="card-img"
-          src="/static/img/records-{{range(1, 5) | random}}.jpg"
+          src="/static/img/records-{{range(1, 7) | random}}.jpg"
           alt="Club Records">
       </div>
 
@@ -72,11 +48,6 @@
         </div>
         <img
           class="card-img"
-          src="/static/img/meets-{{range(1, 5) | random}}.jpg"
+          src="/static/img/meets-{{range(1, 7) | random}}.jpg"
           alt="Meets">
       </div>
-    </div>
-  </main>
-</body>
-</html>
-
