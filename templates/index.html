@@ -22,6 +22,7 @@
   </header>
   <main>
     <div id="content">
+      {% block content %}
       <div
         class="card"
         role="button"
@@ -75,6 +76,7 @@
           src="/static/img/meets-{{range(1, 5) | random}}.jpg"
           alt="Meets">
       </div>
+      {% endblock %}
     </div>
   </main>
 </body>

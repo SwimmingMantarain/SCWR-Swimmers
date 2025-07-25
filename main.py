@@ -14,12 +14,12 @@ templates = Jinja2Templates(directory="templates")
 
 
 # Creates one if it doesn't exist
-db = sqlite3.connect("todo.sql")
+db = sqlite3.connect("swimmers.sql")
 cursor = db.cursor()
 
 # Create table if it doesn't exist
 query = """
-CREATE TABLE IF NOT EXISTS todos (
+CREATE TABLE IF NOT EXISTS swimmers (
     id INTEGER PRIMARY KEY,
     todo_text TEXT NOT NULL,
     done BOOL DEFAULT FALSE
@@ -67,6 +67,13 @@ async def meets_page(request: Request, hx_request: Annotated[Union[str, None], H
     return templates.TemplateResponse(
         request=request, name="meets.html"
     )
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_login(request: Request):
+    return templates.TemplateResponse(
+        request=request, name="admin.html"
+    )
+
 '''
 @app.get("/todos", response_class=HTMLResponse)
 async def list_todos(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
