@@ -24,59 +24,7 @@
   <main>
     <div id="content">
       {% block content %}
-      <div
-        class="card"
-        role="button"
-        tabindex="0"
-        hx-get="/athletes"
-        hx-trigger="click"
-        hx-target="#content"
-        hx-swap="innerHTML swap:0.8s"
-        hx-push-url="true">
-        <div class="card-label">
-          <span id="special">Athletes</span>
-        </div>
-        <img
-          class="card-img"
-          src="/static/img/athletes-{{range(1, 9) | random}}.jpg"
-          alt="Athletes">
-      </div>
-
-      <div
-        class="card"
-        role="button"
-        tabindex="0"
-        hx-get="/records"
-        hx-trigger="click"
-        hx-target="#content"
-        hx-swap="innerHTML swap:0.8s"
-        hx-push-url="true">
-        <div class="card-label">
-          <span id="special">Club Records</span>
-        </div>
-        <img
-          class="card-img"
-          src="/static/img/records-{{range(1, 7) | random}}.jpg"
-          alt="Club Records">
-      </div>
-
-      <div
-        class="card"
-        role="button"
-        tabindex="0"
-        hx-get="/meets"
-        hx-trigger="click"
-        hx-target="#content"
-        hx-swap="innerHTML swap:0.8s"
-        hx-push-url="true">
-        <div class="card-label">
-          <span id="not-special">Past, Present &amp; Upcoming Meets</span>
-        </div>
-        <img
-          class="card-img"
-          src="/static/img/meets-{{range(1, 7) | random}}.jpg"
-          alt="Meets">
-      </div>
+	  {% include 'htmx/index.html' %}
       {% endblock %}
     </div>
   </main>

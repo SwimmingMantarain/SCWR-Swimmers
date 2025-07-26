@@ -5,7 +5,7 @@
 {% block content %}
 <div class="card">
 		<h1>BANANA</h1>
-		<form id="admin-form" hx-post="/admin" hx-on:htmx:after-request="this.reset()">
+		<form id="admin-form" hx-post="/admin" hx-target="#content" hx-swap="innerHTML swap:0.8s" hx-on:htmx:after-request="this.reset()">
 				<input type="password" id="password" name="password" placeholder="Input BANANA" required><br><br>
 				<button type="submit">BANANA</button>
 		</form>

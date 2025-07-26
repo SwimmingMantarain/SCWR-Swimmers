@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Request, Header
+from fastapi import APIRouter, Request, Header, Cookie, HTTPException, Depends
+from fastapi import templating
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from typing import Annotated, Union
@@ -49,6 +50,12 @@ async def meets_page(request: Request, hx_request: Annotated[Union[str, None], H
 
 @router.get("/admin", response_class=HTMLResponse)
 async def admin_login(request: Request):
+    token = request.cookies.get("access_token")
+
+    if token == "secure":
+        return templates.TemplateResponse(
+            request=request, name="htmx/dashboard.html"
+        )
     return templates.TemplateResponse(
-        request=request, name="admin.html"
-    ) 
+        request=request, name="admin/login.html"
+    )
