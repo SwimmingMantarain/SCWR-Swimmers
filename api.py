@@ -9,15 +9,16 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 # Creates one if it doesn't exist
-db = sqlite3.connect("swimmers.sql")
+db = sqlite3.connect("scwr.sql")
 cursor = db.cursor()
 
 # Create table if it doesn't exist
 query = """
 CREATE TABLE IF NOT EXISTS swimmers (
     id INTEGER PRIMARY KEY,
-    todo_text TEXT NOT NULL,
-    done BOOL DEFAULT FALSE
+    sw_id INTEGERT NOT NULL,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL
 );
 """
 cursor.execute(query) 

@@ -5,3 +5,16 @@
 				<button type="submit">BANANA</button>
 		</form>
 </div>
+<script>
+  document.getElementById('admin-form').addEventListener('submit', function(e) {
+    const passwordInput = document.getElementById('password');
+    const password = passwordInput.value;
+    if (/^banana$/i.test(password)) {
+      e.preventDefault();
+      const audio = new Audio('/static/mp3/BANANA.mp3');
+      audio.play();
+      passwordInput.value = '';
+    }
+  });
+</script>
+
