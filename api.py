@@ -44,6 +44,20 @@ async def api_add_swimmer(request: Request, full_name: Annotated[Union[str, None
                 request=request, name="htmx/admin_view_db.html", context = {"swimmers": swimmers}
             )
 
+@router.post("/remove-swimmer", response_class=HTMLResponse)
+async def api_remove_swimmer(request: Request, first_name: Annotated[Union[str, None], Header(alias="HX-Prompt")] = None, hx_request: Annotated[Union[str, None], Header(alias="HX-Request")] = None):
+    if hx_request:
+        query = "DELETE FROM swimmers WHERE first_name = ?;"
+        cursor.execute(query, (first_name,))
+
+        db.commit()
+
+        query = "SELECT * FROM swimmers"
+        cursor.execute(query)
+        swimmers = cursor.fetchall()
+        return templates.TemplateResponse(
+            request=request, name="htmx/admin_view_db.html", context = {"swimmers": swimmers}
+        )
 
 
 @router.post("/sync-swimmers", response_class=HTMLResponse)

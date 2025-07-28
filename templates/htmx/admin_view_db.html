@@ -3,6 +3,7 @@
 		<div class="button-board">
 				<button hx-post="/v1/sync-swimmers" hx-trigger="click" hx-target="#content" hx-swap="innerHTML swap:0.8s">Sync Swimmers</button>
 				<button hx-post="/v1/add-swimmer" hx-prompt="Swimmer's First and Last name (comma seperated)" hx-confirm="Are you BANANA?" hx-target="#content" hx-swap="innerHTML swap:0.8s">Add Swimmer</button>
+				<button hx-post="/v1/remove-swimmer" hx-prompt="Swimmer's First name" hx-confirm="Are you BANANA?" hx-target="#content" hx-swap="innerHTML swap:0.8s">Remove Swimmer</button>
 		</div>
 		<table id="swimmers">
 				<tr>
@@ -14,7 +15,7 @@
 				{% for swimmer in swimmers %}
 						<tr>
 								<td>{% if swimmer[1] %}
-										{{ swimmer[1] }}
+										<a href="https://www.swimrankings.net/index.php?page=athleteDetail&athleteId={{ swimmer[1] }}" target="_blank" rel="noopener noreferrer">{{ swimmer[1] }}</a>
 										{% else %}
 										{{ '-'}}
 										{% endif %}

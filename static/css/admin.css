@@ -60,10 +60,13 @@ body {
 	background: #0a1621 !important;
 } 
 
-#swimmer-input-form {
-		display: flex;
-		align-items: center;
-		gap: 10px;
+a {
+		color: #4a90b8 !important;
+		text-decoration: none !important;
+}
+
+a:hover {
+		text-decoration: underline !important;
 }
 
 table {
