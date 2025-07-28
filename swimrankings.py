@@ -21,7 +21,7 @@ def get_scwr_swimmers():
                 athlete_id = int(a_href[30:37])
                 
                 last_name, first_name = a_name.get_text().split(', ')
-                last_name = last_name.capitalize()
+                last_name = last_name.title()
 
                 birth_year = int(td_byear.get_text())
 
@@ -49,7 +49,7 @@ def get_swimmer(full_name: str):
 
         a_name = td_name.find('a')
         last_name, first_name = a_name.get_text().split(', ')
-        last_name.capitalize()
+        last_name.title()
 
         a_href = a_name['href']
         athlete_id = int(a_href[30:37])

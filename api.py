@@ -1,5 +1,5 @@
 import sqlite3
-from fastapi import APIRouter, Form, Request, Header
+from fastapi import APIRouter, File, Request, Header, UploadFile, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from typing import Union, Annotated
@@ -9,11 +9,9 @@ router = APIRouter(prefix="/v1")
 
 templates = Jinja2Templates(directory="templates")
 
-# Creates one if it doesn't exist
 db = sqlite3.connect("scwr.sql")
 cursor = db.cursor()
 
-# Create table if it doesn't exist
 query = """
 CREATE TABLE IF NOT EXISTS swimmers (
     id INTEGER PRIMARY KEY,
@@ -24,6 +22,36 @@ CREATE TABLE IF NOT EXISTS swimmers (
 );
 """
 cursor.execute(query) 
+
+# Enable foreign keys
+query = """
+PRAGMA foreign_keys = ON;
+"""
+cursor.execute(query);
+
+query = """
+CREATE TABLE IF NOT EXISTS swimmer_photos (
+    id INTEGER PRIMARY KEY,
+    data BLOB NOT NULL,
+    swimmer_sql_id INTEGER NOT NULL,
+    FOREIGN KEY(swimmer_sql_id) REFERENCES swimmers(id)
+)
+"""
+cursor.execute(query)
+
+@router.post("/add-swimmer-photo")
+async def api_add_swimmer_photo(full_name: str = Form(...), photo: UploadFile = File(...)):
+    query = "SELECT id FROM swimmers WHERE first_name = ? AND last_name = ?;"
+    first_name, last_name = full_name.split(',')
+    cursor.execute(query, (first_name, last_name))
+    swimmer_id = int(cursor.fetchall()[0][0])
+    photo_bytes = await photo.read()
+
+    query = """INSERT INTO swimmer_photos(data, swimmer_sql_id)
+               VALUES(?, ?);"""
+    cursor.execute(query, (photo_bytes, swimmer_id))
+    db.commit()
+
 
 @router.post("/add-swimmer", response_class=HTMLResponse)
 async def api_add_swimmer(request: Request, full_name: Annotated[Union[str, None], Header(alias="HX-Prompt")] = None, hx_request: Annotated[Union[str, None], Header(alias="HX-Request")] = None):

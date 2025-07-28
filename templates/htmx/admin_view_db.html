@@ -4,6 +4,7 @@
 				<button hx-post="/v1/sync-swimmers" hx-trigger="click" hx-target="#content" hx-swap="innerHTML swap:0.8s">Sync Swimmers</button>
 				<button hx-post="/v1/add-swimmer" hx-prompt="Swimmer's First and Last name (comma seperated)" hx-confirm="Are you BANANA?" hx-target="#content" hx-swap="innerHTML swap:0.8s">Add Swimmer</button>
 				<button hx-post="/v1/remove-swimmer" hx-prompt="Swimmer's First name" hx-confirm="Are you BANANA?" hx-target="#content" hx-swap="innerHTML swap:0.8s">Remove Swimmer</button>
+				<button type="button" onclick="document.getElementById('swimmer-photo-upload').showModal()">Add Swimmer Photo</button>
 		</div>
 		<table id="swimmers">
 				<tr>
@@ -27,3 +28,18 @@
 				{% endfor %}
 		</table>
 </div>
+
+<dialog id="swimmer-photo-upload">
+		<form hx-post="/v1/add-swimmer-photo" hx-encoding="multipart/form-data" hx-swap="none" hx-on:htmx:after-request="this.reset(); this.closest('dialog').close()">
+				<label for="full_name">Swimmer's First Name</label>
+				<select name="full_name" id="full_name">
+						{% for swimmer in swimmers %}
+								<option value="{{ swimmer[3] }},{{ swimmer[4] }}">{{ swimmer[3] }} {{ swimmer[4] }}</option>
+						{% endfor %}
+				</select>
+				<label for="photo">Photo</label>
+				<input type="file" name="photo" id="photo" accept="image/*" required />
+				<button type="submit" hx-confirm="Are you BANANA?">Banana :)</button>
+				<button type="button" onclick="this.closest('dialog').close()">No Banana :(</button>
+		</form>
+</dialog>
