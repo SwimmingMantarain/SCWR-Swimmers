@@ -17,16 +17,11 @@ h1 {
 	font-family: 'Omniface Regular', sans-serif;
 }
 
-form {
-	display: grid;
-    place-items: center;
-    justify-content: center;
-}
-
 .button-board {
-		display: grid;
+		display: flex;
 		justify-content: center;
 		margin-top: 15px;
+		gap: 10px;
 }
 
 input::placeholder {
