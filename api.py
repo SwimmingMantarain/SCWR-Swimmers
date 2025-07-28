@@ -1,10 +1,11 @@
 import sqlite3
-from fastapi import APIRouter, Form, Request
+from fastapi import APIRouter, Form, Request, Header
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-import bcrypt
+from typing import Union, Annotated
+from swimrankings import get_scwr_swimmers
 
-router = APIRouter()
+router = APIRouter(prefix="/v1")
 
 templates = Jinja2Templates(directory="templates")
 
@@ -16,24 +17,43 @@ cursor = db.cursor()
 query = """
 CREATE TABLE IF NOT EXISTS swimmers (
     id INTEGER PRIMARY KEY,
-    sw_id INTEGERT NOT NULL,
+    sw_id INTEGER NOT NULL,
+    birth_year INTEGER NOT NULL,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL
 );
 """
 cursor.execute(query) 
 
-pw = b'$2b$12$9BhNNcsswdTbqEOI6qUI3.6DOwzFS.ZIRcEn9nSIFlXKRK5qPVxwO'
+@router.post("/add-swimmer", response_class=HTMLResponse)
+async def api_add_swimmer(request: Request, full_name: str = Form(...), hx_request: Annotated[Union[str, None], Header()] = None):
+    if hx_request:
+        print(full_name)
 
-@router.post("/admin", response_class=HTMLResponse)
-async def admin_login(request: Request, password: str = Form(...)):
-    if bcrypt.checkpw(password.encode('utf-8'), pw):
-        token = 'secure'
-        response = templates.TemplateResponse(
-            request=request, name="admin/dashboard.html"
+@router.post("/sync-swimmers", response_class=HTMLResponse)
+async def api_sync_swimmers(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
+    swimmers = get_scwr_swimmers()
+    sw_ids = [swimmer[0] for swimmer in swimmers]
+    for swimmer in swimmers:
+        query = "SELECT * FROM swimmers WHERE sw_id = ?"
+        cursor.execute(query, (swimmer[0],))
+        db_swimmer = cursor.fetchall()
+        if not db_swimmer:
+            query = """INSERT INTO swimmers(sw_id, birth_year, first_name, last_name)
+                        VALUES(?, ?, ?, ?);"""
+            cursor.execute(query, (swimmer[0], swimmer[1], swimmer[2], swimmer[3]))
+
+    # disgusting
+    placeholders = ', '.join(['?'] * len(sw_ids))
+    query = f"DELETE FROM swimmers WHERE sw_id NOT IN ({placeholders});"
+    cursor.execute(query, sw_ids)
+
+    db.commit()
+
+    if hx_request:
+        query = "SELECT * FROM swimmers"
+        cursor.execute(query)
+        swimmers = cursor.fetchall()
+        return templates.TemplateResponse(
+            request=request, name="htmx/admin_view_db.html", context = {"swimmers": swimmers}
         )
-        response.set_cookie(key="access_token", value=token, httponly=True, max_age=3600)
-        return response
-    return templates.TemplateResponse(
-        request=request, name="htmx/admin_login.html"
-    )
