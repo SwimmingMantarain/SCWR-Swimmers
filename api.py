@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS swimmers (
     sw_id INTEGER NOT NULL,
     birth_year INTEGER NOT NULL,
     first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL
+    last_name TEXT NOT NULL,
+    gender INTEGER NOT NULL
 );
 """
 cursor.execute(query) 
@@ -62,7 +63,6 @@ async def api_remove_swimmer_photo(request: Request, photo_id: int = Form(...), 
                 base64_photos.append(
                     (photo[0], base64.b64encode(photo[1]).decode('utf-8'), imghdr.what(None, h=photo[1]),photo[2])
                 )
-                print(type(photo[1]))
             return templates.TemplateResponse(
                 request=request, name="htmx/admin_view_swimmer_photos.html", context={"photos": base64_photos}
             )
@@ -152,9 +152,9 @@ async def api_sync_swimmers(request: Request, hx_request: Annotated[Union[str, N
         cursor.execute(query, (swimmer[0],))
         db_swimmer = cursor.fetchall()
         if not db_swimmer:
-            query = """INSERT INTO swimmers(sw_id, birth_year, first_name, last_name)
+            query = """INSERT INTO swimmers(sw_id, birth_year, first_name, last_name, gender)
                        VALUES(?, ?, ?, ?);"""
-            cursor.execute(query, (swimmer[0], swimmer[1], swimmer[2], swimmer[3]))
+            cursor.execute(query, (swimmer[0], swimmer[1], swimmer[2], swimmer[3], swimmer[4]))
 
     # disgusting
     placeholders = ', '.join(['?'] * len(sw_ids))

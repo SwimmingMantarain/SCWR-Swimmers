@@ -1,6 +1,23 @@
 import requests
 from bs4 import BeautifulSoup
 
+def get_swimmer_gender(sw_id: int):
+    url = f'https://www.swimrankings.net/index.php?page=athleteDetail&athleteId={sw_id}'
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, 'html.parser')
+        header_div = soup.find_all('div', attrs={'id': 'header_athleteDetail'})
+        img = header_div.find('img', attrs={'align': 'top'})
+        # returning 0 for the men to not have the feminists yell at me
+        if img['src'] == 'images/gender1.png':
+            return 0
+        else:
+            return 1
+
+    else:
+        print(f"Failed to get swimmer's gender (Yes they have one!): {reponse.status_code}")
+
 def get_scwr_swimmers():
     url = 'https://www.swimrankings.net/index.php?page=rankingDetail&clubId=73626&gender=1&season=2025&course=LCM&agegroup=0&stroke=9'
     response = requests.get(url)
@@ -25,7 +42,9 @@ def get_scwr_swimmers():
 
                 birth_year = int(td_byear.get_text())
 
-                athletes.append([athlete_id, birth_year, first_name, last_name])
+                gender = get_swimmer_gender(athlete_id)
+
+                athletes.append([athlete_id, birth_year, first_name, last_name, gender])
 
         return athletes
 
@@ -54,7 +73,9 @@ def get_swimmer(full_name: str):
         a_href = a_name['href']
         athlete_id = int(a_href[30:37])
 
-        return [athlete_id, birth_year, first_name, last_name]
+        gender = get_swimmer_gender(athlete_id)
+
+        return [athlete_id, birth_year, first_name, last_name, gender]
 
     else:
         print(f"Failed to fetch Athlete {full_name}: {response.status_code}")

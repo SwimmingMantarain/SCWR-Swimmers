@@ -1,1 +1,13 @@
-<h1>Athletes</h1>
+<div class="card">
+	<h1>Athletes</h1>
+	<div id="athlete-photo-container">
+		{% for sp in sap %}
+			<div class="swimmer-photo">
+				<a hx-get="/athletes/{{ sp[4] }}" hx-trigger="click" hx-target="#content" hx-swap="innerHTML swap:0.8s" hx-push-url="true">{{ sp[0] }} {{ sp[1] }}</a>
+				{% if sp[2] %}
+					<img id="athlete-photo" src="data:image/{{ sp[3] }};base64,{{ sp[2] }}" alt="">
+				{% endif %}
+			</div>
+		{% endfor %}
+	</div>
+<div>

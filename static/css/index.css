@@ -16,6 +16,25 @@ div#logo-wrapper {
 	cursor: pointer;
 }
 
+a {
+		color: #4a90b8 !important;
+		text-decoration: none !important;
+		user-select: none !important;
+}
+
+a:hover {
+		text-decoration: underline !important;
+		cursor: pointer;
+}
+
+h1 {
+	display: grid;
+	margin: 0;
+	justify-content: center;
+	color: #4a90b8;
+	font-family: 'Omniface Regular', sans-serif;
+}
+
 .card {
   position: relative;
   margin: 0;
@@ -23,9 +42,21 @@ div#logo-wrapper {
   border: 2px solid #4a90b8;
   border-radius: 15px;
   overflow: hidden;
-  cursor: pointer;
-  user-select: none;
+  cursor: auto;
+  padding: 32.16px;
 }
+
+.photo-card {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border: 2px solid #4a90b8;
+  border-radius: 15px;
+  overflow: hidden;
+  user-select: none;
+  cursor: pointer;
+}
+
 
 .card-img {
   display: block;
@@ -54,8 +85,8 @@ div#logo-wrapper {
 				transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.card:hover .card-label,
-.card:focus .card-label {
+.photo-card:hover .card-label,
+.photo-card:focus .card-label {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(2);
@@ -105,3 +136,18 @@ html {
   scrollbar-color: #1a3a52 #0a1621;
 }
 
+#athlete-photo-container {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+}
+
+.swimmer-photo {
+		width: 50%;
+		box-sizing: border-box;
+}
+
+#athlete-photo {
+		width: 300px;
+		height: auto;
+}

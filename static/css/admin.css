@@ -5,15 +5,6 @@
     user-select: auto;
 	display: grid;
 	justify-content: center;
-	padding: 32.16px;
-}
-
-h1 {
-	display: grid;
-	margin: 0;
-	justify-content: center;
-	color: #4a90b8;
-	font-family: 'Omniface Regular', sans-serif;
 }
 
 .button-board {
@@ -58,15 +49,6 @@ button:hover, button:focus {
 body {
 	background: #0a1621 !important;
 } 
-
-a {
-		color: #4a90b8 !important;
-		text-decoration: none !important;
-}
-
-a:hover {
-		text-decoration: underline !important;
-}
 
 table {
   width: 100%;
