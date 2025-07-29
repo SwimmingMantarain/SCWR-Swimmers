@@ -5,8 +5,7 @@
     user-select: auto;
 	display: grid;
 	justify-content: center;
-	padding-bottom: 32.16px;
-	padding-top: 32.16px;
+	padding: 32.16px;
 }
 
 h1 {

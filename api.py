@@ -4,6 +4,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from typing import Union, Annotated
 import swimrankings
+import base64
+import imghdr
 
 router = APIRouter(prefix="/v1")
 
@@ -38,6 +40,30 @@ CREATE TABLE IF NOT EXISTS swimmer_photos (
 )
 """
 cursor.execute(query)
+
+@router.post("/get-swimmer-photos", response_class=HTMLResponse)
+async def api_get_swimmer_photos(request: Request, full_name: str = Form(...), hx_request: Annotated[Union[str, None], Header()] = None):
+    if hx_request:
+        first_name, last_name = full_name.split(',')
+        query = "SELECT id FROM swimmers WHERE first_name = ? AND last_name = ?;"
+        cursor.execute(query, (first_name, last_name))
+        swimmer_id = int(cursor.fetchall()[0][0])
+
+        query = "SELECT * FROM swimmer_photos WHERE swimmer_sql_id = ?;"
+        cursor.execute(query, (swimmer_id,))
+        photos = cursor.fetchall()
+
+        if photos:
+            base64_photos = []
+            for photo in photos:
+                base64_photos.append(
+                    (photo[0], base64.b64encode(photo[1]).decode('utf-8'), imghdr.what(None, h=photo[1]),photo[2])
+                )
+                print(type(photo[1]))
+            return templates.TemplateResponse(
+                request=request, name="htmx/admin_view_swimmer_photos.html", context={"photos": base64_photos}
+            )
+
 
 @router.post("/add-swimmer-photo")
 async def api_add_swimmer_photo(full_name: str = Form(...), photo: UploadFile = File(...)):
