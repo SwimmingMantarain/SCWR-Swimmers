@@ -1,3 +1,14 @@
+<form hx-post="/v1/remove-swimmer-photo" hx-target="#photo-div" hx-swap="innerHTML">
+		<select name="photo_id" id="photo_id">
+				{% for photo in photos %}
+						<option value="{{ photo[0] }}">Photo {{ loop.index }}</option>
+				{% endfor %}
+		</select>
+		<button type="submit">BANANA?</button>
+</form>
 {% for photo in photos %}
-<img src="data:image/{{ photo[2] }};base64,{{ photo[1] }}" alt="Photo {{ photo[0] }}">
+<div class="image-container">
+		<p class="image_number">Photo {{ loop.index }}</p>
+		<img src="data:image/{{ photo[2] }};base64,{{ photo[1] }}" alt="Photo {{ loop.index }}">
+</div>
 {% endfor %}

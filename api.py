@@ -41,6 +41,35 @@ CREATE TABLE IF NOT EXISTS swimmer_photos (
 """
 cursor.execute(query)
 
+@router.post("/remove-swimmer-photo", response_class=HTMLResponse)
+async def api_remove_swimmer_photo(request: Request, photo_id: int = Form(...), hx_request: Annotated[Union[str, None], Header()] = None):
+    if hx_request:
+        query = "SELECT swimmer_sql_id FROM swimmer_photos WHERE id = ?;"
+        cursor.execute(query, (photo_id,))
+        swimmer_id = int(cursor.fetchall()[0][0])
+        query = "DELETE FROM swimmer_photos WHERE id = ?;"
+        cursor.execute(query, (photo_id,))
+
+        db.commit()
+
+        query = "SELECT * FROM swimmer_photos WHERE swimmer_sql_id = ?;"
+        cursor.execute(query, (swimmer_id,))
+        photos = cursor.fetchall()
+
+        if photos:
+            base64_photos = []
+            for photo in photos:
+                base64_photos.append(
+                    (photo[0], base64.b64encode(photo[1]).decode('utf-8'), imghdr.what(None, h=photo[1]),photo[2])
+                )
+                print(type(photo[1]))
+            return templates.TemplateResponse(
+                request=request, name="htmx/admin_view_swimmer_photos.html", context={"photos": base64_photos}
+            )
+
+
+
+
 @router.post("/get-swimmer-photos", response_class=HTMLResponse)
 async def api_get_swimmer_photos(request: Request, full_name: str = Form(...), hx_request: Annotated[Union[str, None], Header()] = None):
     if hx_request:
