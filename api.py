@@ -70,7 +70,7 @@ async def api_add_swimmer(request: Request, full_name: Annotated[Union[str, None
             db.insert_into(
                 'swimmers',
                 'sw_id, birth_year, first_name, last_name, gender',
-                f'{swimmer[0]},{swimmer[1]},{swimmer[2]},{swimmer[3]},{swimmer[4]}'
+                f"{swimmer[0]},{swimmer[1]},'{swimmer[2]}','{swimmer[3]}',{swimmer[4]}"
             )
 
             db.commit()
