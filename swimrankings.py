@@ -1,4 +1,5 @@
 import requests
+import time
 from bs4 import BeautifulSoup
 
 def get_swimmer_gender(sw_id: int):
@@ -6,6 +7,8 @@ def get_swimmer_gender(sw_id: int):
     response = requests.get(url)
 
     if response.status_code == 200 and response.text:
+        # prevent swimrankings.net's Windows from sh*tting itself
+        time.sleep(1.0)
         soup = BeautifulSoup(response.text, 'html.parser')
         header_div = soup.find('div', attrs={'id': 'header_athleteDetail'})
         img_div = header_div.find('div', attrs={'id': 'photo'})
