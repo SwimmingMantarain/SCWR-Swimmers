@@ -136,18 +136,13 @@ html {
   scrollbar-color: #1a3a52 #0a1621;
 }
 
-#athlete-photo-container {
+#athlete-name-list{
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: center;
 }
 
-.swimmer-photo {
+.swimmer-link {
 		width: 50%;
 		box-sizing: border-box;
-}
-
-#athlete-photo {
-		width: 300px;
-		height: auto;
 }

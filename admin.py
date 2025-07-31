@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Header, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from typing import Annotated, Union
-from api import cursor
+from api import db
 import bcrypt
 
 router = APIRouter()
@@ -43,9 +43,7 @@ async def admin_view_db(request: Request, hx_request: Annotated[Union[str, None]
 
     if hx_request:
         if token == "secure":
-            query = "SELECT * FROM swimmers"
-            cursor.execute(query)
-            swimmers = cursor.fetchall()
+            swimmers = db.get_all_from('swimmers')
             return templates.TemplateResponse(
                 request=request, name="htmx/admin_view_db.html", context = {"swimmers": swimmers}
             )
@@ -57,9 +55,7 @@ async def admin_view_db(request: Request, hx_request: Annotated[Union[str, None]
             return response
     else:
         if token == "secure":
-            query = "SELECT * FROM swimmers"
-            cursor.execute(query)
-            swimmers = cursor.fetchall()
+            swimmers = db.get_all_from('swimmers')
             return templates.TemplateResponse(
                 request=request, name="admin/view_db.html", context = {"swimmers": swimmers}
             )

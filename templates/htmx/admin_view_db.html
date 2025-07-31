@@ -14,29 +14,33 @@
 						<th>First Name</th>
 						<th>Last Name</th>
 				</tr>
-				{% for swimmer in swimmers %}
-						<tr>
-								<td>{% if swimmer[1] %}
-										<a href="https://www.swimrankings.net/index.php?page=athleteDetail&athleteId={{ swimmer[1] }}" target="_blank" rel="noopener noreferrer">{{ swimmer[1] }}</a>
-										{% else %}
-										{{ '-'}}
-										{% endif %}
-								</td>
-								<td>{{ swimmer[2] }}</td>
-								<td>{{ swimmer[3] }}</td>
-								<td>{{ swimmer[4] }}</td>
-						</tr>
-				{% endfor %}
+				{% if swimmers %}
+						{% for swimmer in swimmers %}
+								<tr>
+										<td>{% if swimmer[1] %}
+												<a href="https://www.swimrankings.net/index.php?page=athleteDetail&athleteId={{ swimmer[1] }}" target="_blank" rel="noopener noreferrer">{{ swimmer[1] }}</a>
+												{% else %}
+												{{ '-'}}
+												{% endif %}
+										</td>
+										<td>{{ swimmer[2] }}</td>
+										<td>{{ swimmer[3] }}</td>
+										<td>{{ swimmer[4] }}</td>
+								</tr>
+						{% endfor %}
+				{% endif %}
 		</table>
 </div>
 
 <dialog id="swimmer-photo-upload">
 		<form hx-post="/v1/add-swimmer-photo" hx-encoding="multipart/form-data" hx-swap="none" hx-on:htmx:after-request="this.reset(); this.closest('dialog').close()">
-				<label for="full_name">Swimmer's Name</label>
-				<select name="full_name" id="full_name">
-						{% for swimmer in swimmers %}
-								<option value="{{ swimmer[3] }},{{ swimmer[4] }}">{{ swimmer[3] }} {{ swimmer[4] }}</option>
-						{% endfor %}
+				<label for="swimmer_id">Swimmer's Name</label>
+				<select name="swimmer_id" id="swimmer_id">
+						{% if swimmers %}
+								{% for swimmer in swimmers %}
+										<option value="{{ swimmer[0] }}">{{ swimmer[3] }} {{ swimmer[4] }}</option>
+								{% endfor %}
+						{% endif %}
 				</select>
 				<label for="photo">Photo</label>
 				<input type="file" name="photo" id="photo" accept="image/*" required />
@@ -46,11 +50,13 @@
 </dialog>
 
 <dialog id="swimmer-photo-view">
-		<label for="full_name">Swimmer's Name</label>
-		<select name="full_name" id="full_name" hx-post="/v1/get-swimmer-photos" hx-trigger="change" hx-target="#photo-div" hx-swap="innerHTML">
-				{% for swimmer in swimmers %}
-						<option value="{{ swimmer[3] }},{{ swimmer[4] }}">{{ swimmer[3] }} {{ swimmer[4] }}</option>
-				{% endfor %}
+		<label for="swimmer_id">Swimmer's Name</label>
+		<select name="swimmer_id" id="swimmer_id" hx-post="/v1/get-swimmer-photos" hx-trigger="change" hx-target="#photo-div" hx-swap="innerHTML">
+				{% if swimmers %}
+						{% for swimmer in swimmers %}
+								<option value="{{ swimmer[0] }}">{{ swimmer[3] }} {{ swimmer[4] }}</option>
+						{% endfor %}
+				{% endif %}
 		</select>
 		<div id="photo-div">
 

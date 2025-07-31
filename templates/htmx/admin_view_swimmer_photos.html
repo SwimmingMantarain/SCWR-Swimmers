@@ -1,7 +1,7 @@
 <form hx-post="/v1/remove-swimmer-photo" hx-target="#photo-div" hx-swap="innerHTML">
 		<select name="photo_id" id="photo_id">
 				{% for photo in photos %}
-						<option value="{{ photo[0] }}">Photo {{ loop.index }}</option>
+						<option value="{{ photo[0] }}, {{ photo[3] }}">Photo {{ loop.index }}</option>
 				{% endfor %}
 		</select>
 		<button type="submit">BANANA?</button>
