@@ -1,14 +1,24 @@
-from fastapi import APIRouter, File, Request, Header, UploadFile, Form
+from fastapi import APIRouter, File, Request, Header, UploadFile, Form, Security, HTTPException, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.security.api_key import APIKeyCookie
 from typing import Union, Annotated
 from db import DB
 import swimrankings
 import base64
 import imghdr
 
-router = APIRouter(prefix="/v1")
+api_key_cookie = APIKeyCookie(name="access_token")
 
+def get_api_key(api_key: str = Security(api_key_cookie)):
+    if api_key != "secure":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Could not validate credentials",
+        )
+    return api_key
+
+router = APIRouter(prefix="/v1", dependencies=[Depends(get_api_key)])
 templates = Jinja2Templates(directory="templates")
 
 db = DB()

@@ -2,6 +2,49 @@ import requests
 import time
 from bs4 import BeautifulSoup
 
+class Filter:
+    def __init__(self, tag: str, attrs: dict = {}, find_all: bool = False):
+        self.tag = tag
+        self.attrs = attrs
+        self.find_all = find_all
+
+class Scraper:
+    def __init__(self, url: str):
+        self.url = url
+        self.response = requests.get(self.url)
+        self.soup = BeautifulSoup(self.response.text, 'html.parser')
+
+    def find(self, filters: list[Filter], end: Filter, data = None):
+        filter = filters.pop(0)
+        if data:
+            if filter.find_all:
+                data = data.find_all(start.tag, attrs=start.attrs)
+            else:
+                data = data.find(start.tag, attrs=start.attrs)
+        else:
+            if filter.find_all:
+                data = self.soup.find_all(start.tag, attrs=start.attrs)
+            else:
+                data = self.soup.find(start.tag, attrs=start.attrs)
+
+
+        if filters:
+            self.find(filters, end, data)
+        else:
+            if data:
+                if filter.find_all:
+                    data = data.find_all(start.tag, attrs=start.attrs)
+                else:
+                    data = data.find(start.tag, attrs=start.attrs)
+            else:
+                if filter.find_all:
+                    data = self.soup.find_all(start.tag, attrs=start.attrs)
+                else:
+                    data = self.soup.find(start.tag, attrs=start.attrs)
+        print(data)
+
+
+
 def get_swimmer_gender(sw_id: int):
     url = f'https://www.swimrankings.net/index.php?page=athleteDetail&athleteId={sw_id}'
     response = requests.get(url)

@@ -7,13 +7,13 @@ class DB:
 
     def init_db(self):
         query = """
-        CREATE TABLE IF NOT EXISTS swimmers (
+        CREATE TABLE IF NOT EXISTS scwr (
             id INTEGER PRIMARY KEY,
-            sw_id INTEGER NOT NULL,
-            birth_year INTEGER NOT NULL,
-            first_name TEXT NOT NULL,
-            last_name NOT NULL,
-            gender INTEGER NOT NULL DEFAULT 2
+            sw_id INTEGER,
+            birth_year INTEGER,
+            first_name TEXT,
+            last_name TEXT,
+            gender INTEGER
         )
         """
 
@@ -25,10 +25,12 @@ class DB:
         self.cursor.execute(query);
 
         query = """
-        CREATE TABLE IF NOT EXISTS swimmer_photos (
+        CREATE TABLE IF NOT EXISTS swimmer_pbs (
             id INTEGER PRIMARY KEY,
-            data BLOB NOT NULL,
-            img_type TEXT NOT NULL,
+            course INTEGER,
+            distance INTEGER,
+            stroke TEXT,
+
             swimmer_sql_id INTEGER NOT NULL,
             FOREIGN KEY(swimmer_sql_id) REFERENCES swimmers(id)
         )
