@@ -4,8 +4,7 @@
 				<button hx-post="/v1/sync-swimmers" hx-trigger="click" hx-target="#content" hx-swap="innerHTML swap:0.8s">Sync Swimmers</button>
 				<button hx-post="/v1/add-swimmer" hx-prompt="Swimmer's First and Last name (comma seperated)" hx-confirm="Are you BANANA?" hx-target="#content" hx-swap="innerHTML swap:0.8s">Add Swimmer</button>
 				<button hx-post="/v1/remove-swimmer" hx-prompt="Swimmer's First name" hx-confirm="Are you BANANA?" hx-target="#content" hx-swap="innerHTML swap:0.8s">Remove Swimmer</button>
-				<button type="button" onclick="document.getElementById('swimmer-photo-upload').showModal()">Add Swimmer Photo</button>
-				<button type="button" onclick="document.getElementById('swimmer-photo-view').showModal()">View Swimmer Photos</button>
+				<button type="button" onclick="document.getElementById('swimmer-pbs').showModal()">View Swimmer PBs</button>
 		</div>
 		<table id="swimmers">
 				<tr>
@@ -13,6 +12,7 @@
 						<th>Birth Year</th>
 						<th>First Name</th>
 						<th>Last Name</th>
+						<th>Gender</th>
 				</tr>
 				{% if swimmers %}
 						{% for swimmer in swimmers %}
@@ -26,39 +26,23 @@
 										<td>{{ swimmer[2] }}</td>
 										<td>{{ swimmer[3] }}</td>
 										<td>{{ swimmer[4] }}</td>
+										<td>{{ swimmer[5] }}</td>
 								</tr>
 						{% endfor %}
 				{% endif %}
 		</table>
 </div>
 
-<dialog id="swimmer-photo-upload">
-		<form hx-post="/v1/add-swimmer-photo" hx-encoding="multipart/form-data" hx-swap="none" hx-on:htmx:after-request="this.reset(); this.closest('dialog').close()">
-				<label for="swimmer_id">Swimmer's Name</label>
-				<select name="swimmer_id" id="swimmer_id">
-						{% if swimmers %}
-								{% for swimmer in swimmers %}
-										<option value="{{ swimmer[0] }}">{{ swimmer[3] }} {{ swimmer[4] }}</option>
-								{% endfor %}
-						{% endif %}
-				</select>
-				<label for="photo">Photo</label>
-				<input type="file" name="photo" id="photo" accept="image/*" required />
-				<button type="submit" hx-confirm="Are you BANANA?">Banana :)</button>
-				<button type="button" onclick="this.closest('dialog').close()">No Banana :(</button>
-		</form>
-</dialog>
-
-<dialog id="swimmer-photo-view">
+<dialog id="swimmer-pbs">
 		<label for="swimmer_id">Swimmer's Name</label>
-		<select name="swimmer_id" id="swimmer_id" hx-post="/v1/get-swimmer-photos" hx-trigger="change" hx-target="#photo-div" hx-swap="innerHTML">
+		<select name="swimmer_id" id="swimmer_id" hx-post="/v1/get-swimmer-pbs" hx-trigger="change" hx-target="#pb-container" hx-swap="innerHTML">
 				{% if swimmers %}
 						{% for swimmer in swimmers %}
 								<option value="{{ swimmer[0] }}">{{ swimmer[3] }} {{ swimmer[4] }}</option>
 						{% endfor %}
 				{% endif %}
 		</select>
-		<div id="photo-div">
+		<div id="pb-container">
 
 		</div>
 </dialog>

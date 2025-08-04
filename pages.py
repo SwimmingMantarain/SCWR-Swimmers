@@ -22,7 +22,8 @@ async def index(request: Request, hx_request: Annotated[Union[str, None], Header
 @router.get("/athletes", response_class=HTMLResponse)
 async def athletes_page(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
     swimmers = db.get_all_from('swimmers')
-    random.shuffle(swimmers)
+    if swimmers:
+        random.shuffle(swimmers)
 
     if hx_request:
         return templates.TemplateResponse(

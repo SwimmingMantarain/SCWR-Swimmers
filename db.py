@@ -7,7 +7,7 @@ class DB:
 
     def init_db(self):
         query = """
-        CREATE TABLE IF NOT EXISTS scwr (
+        CREATE TABLE IF NOT EXISTS scwr_swimmers (
             id INTEGER PRIMARY KEY,
             sw_id INTEGER,
             birth_year INTEGER,

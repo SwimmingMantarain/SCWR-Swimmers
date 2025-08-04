@@ -43,7 +43,7 @@ async def admin_view_db(request: Request, hx_request: Annotated[Union[str, None]
 
     if hx_request:
         if token == "secure":
-            swimmers = db.get_all_from('swimmers')
+            swimmers = db.get_all_from('scwr_swimmers')
             return templates.TemplateResponse(
                 request=request, name="htmx/admin_view_db.html", context = {"swimmers": swimmers}
             )
@@ -55,7 +55,7 @@ async def admin_view_db(request: Request, hx_request: Annotated[Union[str, None]
             return response
     else:
         if token == "secure":
-            swimmers = db.get_all_from('swimmers')
+            swimmers = db.get_all_from('scwr_swimmers')
             return templates.TemplateResponse(
                 request=request, name="admin/view_db.html", context = {"swimmers": swimmers}
             )

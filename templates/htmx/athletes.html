@@ -1,10 +1,12 @@
 <div class="card">
 	<h1>Athletes</h1>
 	<div id="athlete-name-list">
-		{% for swimmer in swimmers %}
-			<div class="swimmer-link">
-				<a hx-get="/athletes/{{ swimmer[0] }}" hx-trigger="click" hx-target="#content" hx-swap="innerHTML swap:0.8s" hx-push-url="true">{{ swimmer[3] }} {{ swimmer[4] }}</a>
-			</div>
-		{% endfor %}
+		{% if swimmers %}
+				{% for swimmer in swimmers %}
+					<div class="swimmer-link">
+						<a hx-get="/athletes/{{ swimmer[0] }}" hx-trigger="click" hx-target="#content" hx-swap="innerHTML swap:0.8s" hx-push-url="true">{{ swimmer[3] }} {{ swimmer[4] }}</a>
+					</div>
+				{% endfor %}
+		{% endif %}
 	</div>
 <div>
