@@ -2,14 +2,19 @@ from fastapi import APIRouter, Request, Header, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from typing import Annotated, Union
+from dotenv import load_dotenv
 from api import db
 import bcrypt
+import os
+
 
 router = APIRouter()
-
 templates = Jinja2Templates(directory="templates")
 
-pw = b'$2b$12$9BhNNcsswdTbqEOI6qUI3.6DOwzFS.ZIRcEn9nSIFlXKRK5qPVxwO'
+
+load_dotenv();
+pw = os.getenv("PASSWORD").encode();
+
 
 @router.post("/admin", response_class=HTMLResponse)
 async def admin_login_post(request: Request, password: str = Form(...)):
