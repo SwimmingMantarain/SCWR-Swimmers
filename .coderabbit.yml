@@ -1,0 +1,8 @@
+version: 1
+review:
+  auto_review: true
+  auto_merge: false
+  reviewers:
+    - coderabbit
+  rules:
+    - "Run on every PR"
