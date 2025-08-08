@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from typing import Annotated, Union
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 from dotenv import load_dotenv
 from api import db
 import bcrypt
@@ -14,30 +15,41 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 load_dotenv()
-pw = os.getenv("PASSWORD").encode()
+pw_hash = os.getenv("PASSWORD")
+if not pw_hash:
+    raise RuntimeError("PASSWORD (bcrypt hash) is not set in .env!!!\n")
+pw = pw_hash.encode()
 
 TOKEN_LIFETIME = timedelta(hours=1)
+COOKIE_MAX_AGE = int(TOKEN_LIFETIME.total_seconds())
 active_tokens = {} # token: expiry
 
-def verify_token(token: str | None) -> bool:
-    if not token: return False
+def verify_token(token: Optional[str]) -> bool:
+    if not token:
+        return False
     expiry = active_tokens.get(token)
     if not expiry:
         return False
     if datetime.now(timezone.utc) > expiry:
-        del active_tokens[token]
+        active_tokens.pop(token)
         return False
     return True
 
 @router.post("/admin", response_class=HTMLResponse)
 async def admin_login_post(request: Request, password: str = Form(...)):
     if bcrypt.checkpw(password.encode('utf-8'), pw):
-        token = secrets.token_urlsafe(128);
+        token = secrets.token_urlsafe(32)
         active_tokens[token] = datetime.now(timezone.utc) + TOKEN_LIFETIME
         response = templates.TemplateResponse(
             request=request, name="admin/dashboard.html"
         )
-        response.set_cookie(key="access_token", value=token, httponly=True, max_age=3600)
+        response.set_cookie(
+            key="access_token",
+            value=token,
+            httponly=True,
+            secure=True, # Only https
+            samesite="lax", # mitigate csrf
+            max_age=COOKIE_MAX_AGE)
         return response
     return templates.TemplateResponse(
         request=request, name="htmx/admin_login.html"
