@@ -5,6 +5,8 @@ from typing import Annotated, Union
 from api import db
 import random
 
+from db import ClubSwimmer
+
 router = APIRouter()
 
 templates = Jinja2Templates(directory="templates")
@@ -21,7 +23,7 @@ async def index(request: Request, hx_request: Annotated[Union[str, None], Header
 
 @router.get("/athletes", response_class=HTMLResponse)
 async def athletes_page(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
-    swimmers = db.get_all_from('swimmers')
+    swimmers = db.query(ClubSwimmer).all()
     if swimmers:
         random.shuffle(swimmers)
 
@@ -35,7 +37,7 @@ async def athletes_page(request: Request, hx_request: Annotated[Union[str, None]
 
 @router.get("/athletes/{swimmer_id}", response_class=HTMLResponse)
 async def specific_athlete_page(request: Request, hx_request: Annotated[Union[str, None], Header()] = None, swimmer_id: int = 0):
-    swimmer = db.get_one_from('swimmers', sql_filter=f'id = {swimmer_id}')
+    swimmer = db.query(ClubSwimmer).filter_by(id=swimmer_id)
     if swimmer:
         if hx_request:
             return templates.TemplateResponse(

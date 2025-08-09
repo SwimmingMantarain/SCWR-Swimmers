@@ -4,11 +4,12 @@ from fastapi.templating import Jinja2Templates
 from typing import Annotated, Union
 from datetime import datetime, timedelta, timezone
 from typing import Optional
+from db import db, ClubSwimmer
 from dotenv import load_dotenv
-from api import db
 import bcrypt
 import secrets
 import os
+
 
 
 router = APIRouter()
@@ -74,7 +75,7 @@ async def admin_view_db(request: Request, hx_request: Annotated[Union[str, None]
 
     if hx_request:
         if verify_token(token):
-            swimmers = db.get_all_from('scwr_swimmers')
+            swimmers = db.query(ClubSwimmer).all()
             return templates.TemplateResponse(
                 request=request, name="htmx/admin_view_db.html", context = {"swimmers": swimmers}
             )
@@ -86,7 +87,7 @@ async def admin_view_db(request: Request, hx_request: Annotated[Union[str, None]
             return response
     else:
         if verify_token(token):
-            swimmers = db.get_all_from('scwr_swimmers')
+            swimmers = db.query(ClubSwimmer).all()
             return templates.TemplateResponse(
                 request=request, name="admin/view_db.html", context = {"swimmers": swimmers}
             )
