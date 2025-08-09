@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source .venv/bin/activate
-
 fastapi dev app.py --host 0.0.0.0 &
 PID=$!
 

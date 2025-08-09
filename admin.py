@@ -2,23 +2,55 @@ from fastapi import APIRouter, Request, Header, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from typing import Annotated, Union
-from api import db
+from datetime import datetime, timedelta, timezone
+from typing import Optional
+from db import db, ClubSwimmer
+from dotenv import load_dotenv
 import bcrypt
+import secrets
+import os
+
+
 
 router = APIRouter()
-
 templates = Jinja2Templates(directory="templates")
 
-pw = b'$2b$12$9BhNNcsswdTbqEOI6qUI3.6DOwzFS.ZIRcEn9nSIFlXKRK5qPVxwO'
+load_dotenv()
+pw_hash = os.getenv("PASSWORD")
+if not pw_hash:
+    raise RuntimeError("PASSWORD (bcrypt hash) is not set in .env!!!\n")
+pw = pw_hash.encode()
+
+TOKEN_LIFETIME = timedelta(hours=1)
+COOKIE_MAX_AGE = int(TOKEN_LIFETIME.total_seconds())
+active_tokens = {} # token: expiry
+
+def verify_token(token: Optional[str]) -> bool:
+    if not token:
+        return False
+    expiry = active_tokens.get(token)
+    if not expiry:
+        return False
+    if datetime.now(timezone.utc) > expiry:
+        active_tokens.pop(token)
+        return False
+    return True
 
 @router.post("/admin", response_class=HTMLResponse)
 async def admin_login_post(request: Request, password: str = Form(...)):
     if bcrypt.checkpw(password.encode('utf-8'), pw):
-        token = 'secure'
+        token = secrets.token_urlsafe(32)
+        active_tokens[token] = datetime.now(timezone.utc) + TOKEN_LIFETIME
         response = templates.TemplateResponse(
             request=request, name="admin/dashboard.html"
         )
-        response.set_cookie(key="access_token", value=token, httponly=True, max_age=3600)
+        response.set_cookie(
+            key="access_token",
+            value=token,
+            httponly=True,
+            secure=True, # Only https
+            samesite="lax", # mitigate csrf
+            max_age=COOKIE_MAX_AGE)
         return response
     return templates.TemplateResponse(
         request=request, name="htmx/admin_login.html"
@@ -29,7 +61,7 @@ async def admin_login_post(request: Request, password: str = Form(...)):
 async def admin_login(request: Request):
     token = request.cookies.get("access_token")
 
-    if token == "secure":
+    if verify_token(token):
         return templates.TemplateResponse(
             request=request, name="htmx/dashboard.html"
         )
@@ -42,8 +74,8 @@ async def admin_view_db(request: Request, hx_request: Annotated[Union[str, None]
     token = request.cookies.get("access_token")
 
     if hx_request:
-        if token == "secure":
-            swimmers = db.get_all_from('scwr_swimmers')
+        if verify_token(token):
+            swimmers = db.query(ClubSwimmer).all()
             return templates.TemplateResponse(
                 request=request, name="htmx/admin_view_db.html", context = {"swimmers": swimmers}
             )
@@ -54,8 +86,8 @@ async def admin_view_db(request: Request, hx_request: Annotated[Union[str, None]
             response.headers["HX-Push-Url"] = "/admin"
             return response
     else:
-        if token == "secure":
-            swimmers = db.get_all_from('scwr_swimmers')
+        if verify_token(token):
+            swimmers = db.query(ClubSwimmer).all()
             return templates.TemplateResponse(
                 request=request, name="admin/view_db.html", context = {"swimmers": swimmers}
             )
