@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Request, Header, Form
+from fastapi import APIRouter, Request, Header, Form, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 from typing import Annotated, Union
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-from db import Token, db, ClubSwimmer
+from db import Token, ClubSwimmer, get_db
 from dotenv import load_dotenv
 import bcrypt
 import secrets
@@ -24,30 +26,32 @@ pw = pw_hash.encode()
 TOKEN_LIFETIME = timedelta(hours=1)
 COOKIE_MAX_AGE = int(TOKEN_LIFETIME.total_seconds())
 
-def verify_token(token_str: Optional[str]) -> bool:
+def verify_token(token_str: Optional[str], db: Session = Depends(get_db)) -> bool:
     if not token_str:
         return False
-
-    token = db.query(Token).filter_by(token=token_str).first()
+    
+    stmt = select(Token).where(Token.token == token_str)
+    token = db.execute(stmt).first()
 
     if not token:
         return False
 
     expiry = token.expiry
-
-    # TODO: Fix for Postgres Migration
-    if expiry.tzinfo is None:
-        expiry = expiry.replace(tzinfo=timezone.utc)
+    expiry.replace(tzinfo=timezone.utc) # Just ensure UTC no matter what
 
     if datetime.now(timezone.utc) > expiry:
-        db.rm(token)
-        db.session.commit()
+        db.delete(token)
+        db.commit()
         return False
 
     return True
 
 @router.post("/admin", response_class=HTMLResponse)
-async def admin_login_post(request: Request, password: str = Form(...)):
+async def admin_login_post(
+    request: Request,
+    db: Session = Depends(get_db),
+    password: str = Form(...)
+):
     if bcrypt.checkpw(password.encode('utf-8'), pw):
         token_str = secrets.token_urlsafe(32)
         expiry = datetime.now(timezone.utc) + TOKEN_LIFETIME
@@ -58,7 +62,7 @@ async def admin_login_post(request: Request, password: str = Form(...)):
         )
 
         db.add(token)
-        db.session.commit()
+        db.commit()
 
         response = templates.TemplateResponse(
             request=request, name="admin/dashboard.html"
@@ -90,12 +94,17 @@ async def admin_login(request: Request):
     )
 
 @router.get("/admin/view-db", response_class=HTMLResponse)
-async def admin_view_db(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
+async def admin_view_db(
+    request: Request,
+    db: Session = Depends(get_db),
+    hx_request: Annotated[Union[str, None], Header()] = None
+):
     token = request.cookies.get("access_token")
 
     if hx_request:
         if verify_token(token):
-            swimmers = db.query(ClubSwimmer).all()
+            stmt = select(ClubSwimmer)
+            swimmers = db.execute(stmt).scalars().all()
             return templates.TemplateResponse(
                 request=request, name="htmx/admin_view_db.html", context = {"swimmers": swimmers}
             )

@@ -2,8 +2,9 @@ from fastapi import APIRouter, File, Request, Header, UploadFile, Form, Security
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.security.api_key import APIKeyCookie
+from sqlalchemy.orm import Session
 from typing import Union, Annotated
-from db import db, ClubSwimmer
+from db import ClubSwimmer, get_db
 from admin import verify_token
 import swimrankings
 
@@ -21,7 +22,12 @@ router = APIRouter(prefix="/v1", dependencies=[Depends(get_api_key)])
 templates = Jinja2Templates(directory="templates")
 
 @router.post("/add-swimmer", response_class=HTMLResponse)
-async def api_add_swimmer(request: Request, full_name: Annotated[Union[str, None], Header(alias="HX-Prompt")] = None, hx_request: Annotated[Union[str, None], Header(alias="HX-Request")] = None):
+async def api_add_swimmer(
+    request: Request,
+    db: Session = Depends(get_db),
+    full_name: Annotated[Union[str, None], Header(alias="HX-Prompt")] = None,
+    hx_request: Annotated[Union[str, None], Header(alias="HX-Request")] = None
+):
     if hx_request:
         swimmer = swimrankings.get_swimmer(full_name)
 
@@ -34,7 +40,7 @@ async def api_add_swimmer(request: Request, full_name: Annotated[Union[str, None
                 gender = int(swimmer[4])
             )
             db.add(swimmer)
-            db.session.commit()
+            db.commit()
 
             swimmers = db.query(ClubSwimmer).all()
             return templates.TemplateResponse(
