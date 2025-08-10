@@ -61,7 +61,7 @@ async def api_sync_swimmers(request: Request, hx_request: Annotated[Union[str, N
     swimmers = swimrankings.get_scwr_swimmers()
     if swimmers:
         for swimmer in swimmers:
-            db_swimmer = db.query(ClubSwimmer).filter_by(sw_id=swimmer[0])
+            db_swimmer = db.query(ClubSwimmer).filter_by(sw_id=swimmer[0]).first()
             if not db_swimmer:
                 swimmer = ClubSwimmer(
                     sw_id = int(swimmer[0]),

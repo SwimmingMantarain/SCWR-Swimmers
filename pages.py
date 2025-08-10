@@ -37,7 +37,7 @@ async def athletes_page(request: Request, hx_request: Annotated[Union[str, None]
 
 @router.get("/athletes/{swimmer_id}", response_class=HTMLResponse)
 async def specific_athlete_page(request: Request, hx_request: Annotated[Union[str, None], Header()] = None, swimmer_id: int = 0):
-    swimmer = db.query(ClubSwimmer).filter_by(id=swimmer_id)
+    swimmer = db.query(ClubSwimmer).filter_by(id=swimmer_id).first()
     if swimmer:
         if hx_request:
             return templates.TemplateResponse(
