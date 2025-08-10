@@ -13,6 +13,6 @@ else
 		echo "Please manually open http://localhost:8000/"
 fi
 
-trap 'echo "Interrupted. Stopping Fastapi Server..."; kill $PID; exit' INT
+trap 'echo "Interrupted. Stopping Fastapi Server..."; kill $PID; wait $PID 2>/dev/null; clear; exit' INT
 
 wait $PID

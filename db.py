@@ -1,5 +1,5 @@
 from sqlalchemy.orm import declarative_base, sessionmaker
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine, Column, Integer, String, DateTime
 from dotenv import load_dotenv
 import os
 
@@ -10,6 +10,13 @@ if not db_location_env:
 db_location = db_location_env
 
 Base = declarative_base()
+
+class Token(Base):
+    __tablename__ = 'admin_tokens'
+    id = Column(Integer, primary_key=True)
+    token = Column(String)
+    expiry = Column(DateTime)
+
 
 class ClubSwimmer(Base):
     __tablename__ = 'scwr_swimmers'
@@ -28,18 +35,18 @@ class DB:
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
 
-    def add(self, object: ClubSwimmer | None = None):
+    def add(self, object: ClubSwimmer | Token | None = None):
         if not object:
             raise ValueError("[DB ERROR]: `Object to add not provided!`\n")
 
         self.session.add(object)
 
-    def rm(self, object: ClubSwimmer | None = None):
+    def rm(self, object: ClubSwimmer | Token | None = None):
         if not object:
             raise ValueError("[DB ERROR]: `Object to remove not provided!\n")
         self.session.delete(object)
 
-    def query(self, type: type[ClubSwimmer] | None = None) :
+    def query(self, type: type[ClubSwimmer | Token] | None = None) :
         return self.session.query(type)
 
 db = DB()
