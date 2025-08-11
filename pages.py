@@ -11,7 +11,12 @@ router = APIRouter()
 
 templates = Jinja2Templates(directory="templates")
 
-@router.get("/", response_class=HTMLResponse)
+@router.get(
+    "/",
+    response_class=HTMLResponse,
+    summary='Returns the home page',
+    description='What more can I say?'
+)
 async def index(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
     if hx_request:
         return templates.TemplateResponse(
@@ -21,7 +26,12 @@ async def index(request: Request, hx_request: Annotated[Union[str, None], Header
         request=request, name="index.html"
     )
 
-@router.get("/athletes", response_class=HTMLResponse)
+@router.get(
+    "/athletes",
+    response_class=HTMLResponse,
+    summary='Returns the athletes page',
+    description='The page is just a list of swimmers in the db.'
+)
 async def athletes_page(
     request: Request,
     db: Session = Depends(get_db),
@@ -38,7 +48,12 @@ async def athletes_page(
         request=request, name="athletes.html", context={'swimmers': swimmers}
     )
 
-@router.get("/athletes/{swimmer_id}", response_class=HTMLResponse)
+@router.get(
+    "/athletes/{swimmer_id}",
+    response_class=HTMLResponse,
+    summary='Returns portfolio of a specific swimmer',
+    description='Uses the `swimmer_id` to fetch data about that swimmer from the db. If that id isn\'t in the db, user gets redirected back to `/athletes`.'
+)
 async def specific_athlete_page(
     request: Request,
     swimmer_id: int,
@@ -60,7 +75,12 @@ async def specific_athlete_page(
     else:
         return RedirectResponse("/athletes", status_code=302)
 
-@router.get("/records", response_class=HTMLResponse)
+@router.get(
+    "/records",
+    response_class=HTMLResponse,
+    summary='Returns the club records page',
+    description='W.I.P.'
+)
 async def records_page(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
     if hx_request:
         return templates.TemplateResponse(
@@ -70,7 +90,12 @@ async def records_page(request: Request, hx_request: Annotated[Union[str, None],
         request=request, name="records.html"
     )
 
-@router.get("/meets", response_class=HTMLResponse)
+@router.get(
+    "/meets",
+    response_class=HTMLResponse,
+    summary='Returns the meat',
+    description='MEAT'
+)
 async def meets_page(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
     if hx_request:
         return templates.TemplateResponse(
