@@ -43,10 +43,10 @@ class ClubSwimmer(Base):
 
     id = Column(Integer, primary_key=True)
     sw_id = Column(Integer, nullable=False)
-    birth_year = Column(Integer, nullable=True)
+    birth_year = Column(Integer, nullable=False)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
-    gender = Column(Integer)  # 0: man, 1: woman
+    gender = Column(Integer, nullable=False)  # 0: man, 1: woman
 
 engine = create_engine(db_location_env)
 Base.metadata.create_all(engine)
