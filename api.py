@@ -12,6 +12,22 @@ import swimrankings
 api_key_cookie = APIKeyCookie(name="access_token")
 
 def get_api_key(db: Session = Depends(get_db), api_key: str = Security(api_key_cookie)):
+    """
+    Checks whether user has valid credentials
+
+    Side effects:
+    - Calls `verify_token` which deletes expired tokens and commits the change
+
+    Args:
+        db (Session): SQLAlchemy database session.
+        api_key (str): The api token to verify
+
+    Returns:
+        str: The api key
+
+    Raises:
+        HTTPException: If `api_key` isn't valid
+    """
     if not verify_token(api_key, db):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -22,7 +38,12 @@ def get_api_key(db: Session = Depends(get_db), api_key: str = Security(api_key_c
 router = APIRouter(prefix="/v1", dependencies=[Depends(get_api_key)])
 templates = Jinja2Templates(directory="templates")
 
-@router.post("/add-swimmer", response_class=HTMLResponse)
+@router.post(
+    "/add-swimmer",
+    response_class=HTMLResponse,
+    summary='API endpoint to add a swimmer to db',
+    description='Fetches swimmer\'s data from swimranings.net and adds that data to the database.'
+)
 async def api_add_swimmer(
     request: Request,
     db: Session = Depends(get_db),
@@ -51,7 +72,12 @@ async def api_add_swimmer(
         else:
             return RedirectResponse('/admin/view-db', status_code=302)
 
-@router.post("/remove-swimmer", response_class=HTMLResponse)
+@router.post(
+    "/remove-swimmer",
+    response_class=HTMLResponse,
+    summary='API endpoint to remove a swimmer from db',
+    description='Takes in the swimmer\'s first name, finds them in the db and removes them.'
+)
 async def api_remove_swimmer(
     request: Request,
     db: Session = Depends(get_db),
@@ -70,7 +96,12 @@ async def api_remove_swimmer(
         )
 
 
-@router.post("/sync-swimmers", response_class=HTMLResponse)
+@router.post(
+    "/sync-swimmers",
+    response_class=HTMLResponse,
+    summary='API endpoint to sync current swimmers in db with ones registered in swimrankings.net',
+    description='Updates the database entries of the swimmers based on what gets scraped from swimrankings.net. If a new swimmer appears, they get added to the db. If one disappears, they are removed from the db.'
+)
 async def api_sync_swimmers(
     request: Request,
     db: Session = Depends(get_db),

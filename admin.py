@@ -28,6 +28,10 @@ def verify_token(token_str: Optional[str], db: Session) -> bool:
     """
     Check whether an access token exists and is not expired.
 
+    
+    Side effects:
+    - Deletes expired tokens from the database and commits the change.
+
     Args:
         token_str (Optional[str]): The access token string to verify.
         db (Session): SQLAlchemy database session.

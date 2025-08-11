@@ -54,4 +54,4 @@ To see all endpoints:
 - 📺 Viewing meet livestreams
 
 ## 📜 License
-**MIT**
+This project is licensed under the MIT License. See [LICENSE](./LICENSE) for details.
