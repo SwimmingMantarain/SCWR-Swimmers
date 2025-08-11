@@ -93,8 +93,8 @@ async def records_page(request: Request, hx_request: Annotated[Union[str, None],
 @router.get(
     "/meets",
     response_class=HTMLResponse,
-    summary='Returns the meat',
-    description='MEAT'
+    summary='Returns the meets page',
+    description='Displays information about swim meets and competitions.'
 )
 async def meets_page(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
     if hx_request:
