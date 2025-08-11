@@ -29,15 +29,15 @@ def rate_limited(min_interval):
     return decorator
 
 class URLBook:
-    def SwimmerPortfolioPageById(self, sw_id: int):
+    def swimmer_portfolio_page_by_id(self, sw_id: int):
         url = f'https://www.swimrankings.net/index.php?page=athleteDetail&athleteId={sw_id}'
         return url
 
-    def SwimmerPortfolioPageByFullName(self, first_name: str, last_name: str):
+    def swimmer_portfolio_page_by_full_name(self, first_name: str, last_name: str):
         url = f'https://www.swimrankings.net/index.php?&internalRequest=athleteFind&athlete_clubId=-1&athlete_gender=-1&athlete_lastname={last_name}&athlete_firstname={first_name}'
         return url
 
-    def SCWRPage(self):
+    def scwr_page(self):
         url = 'https://www.swimrankings.net/index.php?page=rankingDetail&clubId=73626&gender=1&season=2025&course=LCM&agegroup=0&stroke=9'
         return url
 
@@ -54,8 +54,7 @@ class Swimmer:
     gender: Gender
 
 class SwimrankingsScraper:
-    def __init__(self, rate_limit: int = 1):
-        self.rate_limit = rate_limit
+    def __init__(self):
         self.url_book = URLBook()
         self.client = httpx.AsyncClient()
 
@@ -113,13 +112,12 @@ class SwimrankingsScraper:
             The reason for this is because its server os is Windows. lmaoo
 
         Returns:
-            list: a list of lists with the structure:
-                    [swimrankings unique id, birth year, first name, last name, gender]
+            list[Swimmer]: A list of Swimmer objects containing swimmer data
 
         Raises:
             RuntimeError: If `response.status_code` isn't 200
         """
-        url = self.url_book.SCWRPage()
+        url = self.url_book.scwr_page()
         response = await self._fetch(url)
 
         if response.status_code == 200 and response.text:
@@ -170,13 +168,13 @@ class SwimrankingsScraper:
             full_name (str): The full name of the swimmer seperated by a ', '
 
         Returns:
-            list: The data of the swimmer -> [swimrankings unique id, birth year, first name, last name, gender]
+            Swimmer: A Swimmer object containing the swimmer's data
 
         Raises:
             RuntimeError: If `response.status_code` isn't 200 and if `sw_id` isn't valid
         """
         first_name, last_name = full_name.split(', ')
-        url = self.url_book.SwimmerPortfolioPageByFullName(first_name, last_name)
+        url = self.url_book.swimmer_portfolio_page_by_full_name(first_name, last_name)
         response = await self._fetch(url)
 
         if response.status_code == 200 and response.text:
