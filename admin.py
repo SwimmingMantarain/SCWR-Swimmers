@@ -12,8 +12,6 @@ import bcrypt
 import secrets
 import os
 
-
-
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
@@ -26,18 +24,17 @@ pw = pw_hash.encode()
 TOKEN_LIFETIME = timedelta(hours=1)
 COOKIE_MAX_AGE = int(TOKEN_LIFETIME.total_seconds())
 
-def verify_token(token_str: Optional[str], db: Session = Depends(get_db)) -> bool:
+def verify_token(token_str: Optional[str], db: Session) -> bool:
     if not token_str:
         return False
     
     stmt = select(Token).where(Token.token == token_str)
-    token = db.execute(stmt).first()
+    token = db.execute(stmt).scalar_one_or_none()
 
     if not token:
         return False
 
-    expiry = token.expiry
-    expiry.replace(tzinfo=timezone.utc) # Just ensure UTC no matter what
+    expiry = token.expiry.replace(tzinfo=timezone.utc) # Just ensure UTC no matter what
 
     if datetime.now(timezone.utc) > expiry:
         db.delete(token)
@@ -82,10 +79,10 @@ async def admin_login_post(
 
 
 @router.get("/admin", response_class=HTMLResponse)
-async def admin_login(request: Request):
+async def admin_login(request: Request, db: Session = Depends(get_db)):
     token = request.cookies.get("access_token")
 
-    if verify_token(token):
+    if verify_token(token, db):
         return templates.TemplateResponse(
             request=request, name="htmx/dashboard.html"
         )
@@ -102,7 +99,7 @@ async def admin_view_db(
     token = request.cookies.get("access_token")
 
     if hx_request:
-        if verify_token(token):
+        if verify_token(token, db):
             stmt = select(ClubSwimmer)
             swimmers = db.execute(stmt).scalars().all()
             return templates.TemplateResponse(
@@ -115,8 +112,9 @@ async def admin_view_db(
             response.headers["HX-Push-Url"] = "/admin"
             return response
     else:
-        if verify_token(token):
-            swimmers = db.query(ClubSwimmer).all()
+        if verify_token(token, db):
+            stmt = select(ClubSwimmer)
+            swimmers = db.execute(stmt).scalars().all()
             return templates.TemplateResponse(
                 request=request, name="admin/view_db.html", context = {"swimmers": swimmers}
             )

@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Request, Header
+from fastapi import APIRouter, Request, Header, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from typing import Annotated, Union
-from api import db
-import random
+from sqlalchemy.orm import Session
+from sqlalchemy import select
+from db import get_db, ClubSwimmer
 
-from db import ClubSwimmer
 
 router = APIRouter()
 
@@ -22,10 +22,13 @@ async def index(request: Request, hx_request: Annotated[Union[str, None], Header
     )
 
 @router.get("/athletes", response_class=HTMLResponse)
-async def athletes_page(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
-    swimmers = db.query(ClubSwimmer).all()
-    if swimmers:
-        random.shuffle(swimmers)
+async def athletes_page(
+    request: Request,
+    db: Session = Depends(get_db),
+    hx_request: Annotated[Union[str, None], Header()] = None
+):
+    stmt = select(ClubSwimmer)
+    swimmers = db.execute(stmt).scalars().all()
 
     if hx_request:
         return templates.TemplateResponse(
@@ -36,8 +39,14 @@ async def athletes_page(request: Request, hx_request: Annotated[Union[str, None]
     )
 
 @router.get("/athletes/{swimmer_id}", response_class=HTMLResponse)
-async def specific_athlete_page(request: Request, hx_request: Annotated[Union[str, None], Header()] = None, swimmer_id: int = 0):
-    swimmer = db.query(ClubSwimmer).filter_by(id=swimmer_id).first()
+async def specific_athlete_page(
+    request: Request,
+    swimmer_id: int,
+    db: Session = Depends(get_db),
+    hx_request: Annotated[Union[str, None], Header()] = None
+):
+    stmt = select(ClubSwimmer).filter_by(id=swimmer_id)
+    swimmer = db.execute(stmt).scalar_one_or_none()
     if swimmer:
         if hx_request:
             return templates.TemplateResponse(
