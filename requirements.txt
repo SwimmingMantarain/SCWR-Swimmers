@@ -3,5 +3,5 @@ bcrypt==4.3.0
 Requests==2.32.4
 fastapi[standard]==0.116.1
 SQLAlchemy==2.0.42
-httpx=0.28.1
-lxml=6.0.0
+httpx==0.28.1
+lxml==6.0.0

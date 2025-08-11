@@ -99,8 +99,8 @@ class SwimrankingsScraper:
                 else:
                     return Gender(1)
 
-            except:
-                raise RuntimeError("[SCRAPING ERROR]: Failed to find swimmer's gender! Maybe id is wrong?")
+            except Exception as e:
+                raise RuntimeError("[SCRAPING ERROR]: Failed to find swimmer's gender! Maybe id is wrong?") from e
         else:
             raise RuntimeError(f"[SCRAPING ERROR]: `Failed to scrape: {response.status_code}`")
 
@@ -158,7 +158,7 @@ class SwimrankingsScraper:
         else:
             raise RuntimeError(f"[SCRAPING ERROR]: `Failed to scrape: {response.status_code}`")
 
-    async def get_swimmer(self, full_name: str):
+    async def get_swimmer(self, full_name: str) -> Swimmer:
         """
         Scrapes swimrankings to find data about a swimmer based on a comma seperated name that is provided
 
@@ -192,17 +192,24 @@ class SwimrankingsScraper:
 
                 a_name = td_name.find('a')
                 last_name, first_name = a_name.get_text().split(', ')
-                last_name.title()
+                last_name = last_name.title()
 
                 a_href = a_name['href']
                 athlete_id = int(a_href[30:37])
 
-                gender = self.get_swimmer_gender(athlete_id)
+                gender = await self.get_swimmer_gender(athlete_id)
 
-                return [athlete_id, birth_year, first_name, last_name, gender]
+                swimmer = Swimmer(
+                    athlete_id,
+                    birth_year,
+                    first_name,
+                    last_name,
+                    gender
+                )
+                return swimmer
             
-            except:
-                raise RuntimeError("[SCRAPING ERROR]: Failed to find swimmer's data! Maybe name is wrong?")
+            except Exception as e:
+                raise RuntimeError("[SCRAPING ERROR]: Failed to find swimmer's data! Maybe name is wrong?") from e
 
         else:
             raise RuntimeError(f"[SCRAPING ERROR]: `Failed to scrape: {response.status_code}`")
