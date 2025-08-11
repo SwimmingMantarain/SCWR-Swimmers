@@ -74,7 +74,7 @@ async def api_add_swimmer(
                 birth_year = swimmer.birth_year,
                 first_name = swimmer.first_name,
                 last_name = swimmer.last_name,
-                gender = swimmer.gender
+                gender = swimmer.gender.value
             )
             db.add(swimmer)
             db.commit()
@@ -152,13 +152,12 @@ async def api_sync_swimmers(
         for swimmer in swimmers:
             sw_ids.append(swimmer.sw_id)
 
-        stmt = select(ClubSwimmer).filter(ClubSwimmer.sw_id.not_in(sw_ids))
-        swimmers = db.execute(stmt).scalars().all()
-
-        stmt = delete(ClubSwimmer).where(ClubSwimmer.sw_id.not_in(sw_ids))
+        stmt = delete(ClubSwimmer).where(ClubSwimmer.sw_id.notin_(sw_ids))
         db.execute(stmt)
         db.commit()
 
+        stmt = select(ClubSwimmer)
+        swimmers = db.execute(stmt).scalars().all()
 
     if hx_request:
         stmt = select(ClubSwimmer)
