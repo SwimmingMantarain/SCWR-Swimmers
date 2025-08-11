@@ -130,7 +130,7 @@ def get_swimmer(full_name: str):
             return [athlete_id, birth_year, first_name, last_name, gender]
         
         except:
-            raise RuntimeError("[SCRSPING ERROR]: Failed to find swimmer's data! Maybe name is wrong?")
+            raise RuntimeError("[SCRAPING ERROR]: Failed to find swimmer's data! Maybe name is wrong?")
 
     else:
         raise RuntimeError(f"[SCRAPING ERROR]: `Failed to scrape: {response.status_code}`")
