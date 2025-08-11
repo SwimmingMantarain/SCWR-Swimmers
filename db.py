@@ -12,26 +12,57 @@ if not db_location_env:
 Base = declarative_base()
 
 class Token(Base):
+    """
+    Stores authentication tokens for admin functionality.
+
+    Attributes:
+        id (int): Unique primary key.
+        token (str): Token secret string.
+        expiry (datetime): Expiration datetime of the token (timezone-aware).
+    """
     __tablename__ = 'admin_tokens'
+
     id = Column(Integer, primary_key=True)
-    token = Column(String)
-    expiry = Column(DateTime(timezone=True))
+    token = Column(String, nullable=False)
+    expiry = Column(DateTime(timezone=True), nullable=False)
 
 
 class ClubSwimmer(Base):
+    """
+    Stores primary swimmer data for use in `/athletes` endpoint.
+
+    Attributes:
+        id (int): Unique primary key.
+        sw_id (int): Unique swimmer ID from swimrankings.net.
+        birth_year (int): Birth year of the swimmer.
+        first_name (str): First name of the swimmer.
+        last_name (str): Last name of the swimmer (including middle names).
+        gender (int): Gender of the swimmer (0: man, 1: woman).
+    """
     __tablename__ = 'scwr_swimmers'
+
     id = Column(Integer, primary_key=True)
-    sw_id = Column(Integer)
-    birth_year = Column(Integer)
-    first_name = Column(String)
-    last_name = Column(String)
-    gender = Column(Integer) # 0: man, 1: woman
+    sw_id = Column(Integer, nullable=False)
+    birth_year = Column(Integer, nullable=False)
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
+    gender = Column(Integer, nullable=False)  # 0: man, 1: woman
 
 engine = create_engine(db_location_env)
 Base.metadata.create_all(engine)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def get_db() -> Generator[Session, None, None]:
+    """
+    Provides a transactional scope around a series of database operations.
+
+    Yields:
+        Session: SQLAlchemy database session.
+
+    Usage:
+        This generator is intended to be used with FastAPI dependencies to
+        provide a database session that is properly closed after use.
+    """
     db = SessionLocal()
     try:
         yield db
