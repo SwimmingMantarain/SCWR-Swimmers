@@ -1,15 +1,18 @@
-from fastapi import APIRouter, File, Request, Header, UploadFile, Form, Security, HTTPException, status, Depends
+from fastapi import APIRouter, Request, Header, Security, HTTPException, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.security.api_key import APIKeyCookie
+from sqlalchemy.orm import Session
+from sqlalchemy import select
 from typing import Union, Annotated
-from db import DB
+from db import ClubSwimmer, get_db
+from admin import verify_token
 import swimrankings
 
 api_key_cookie = APIKeyCookie(name="access_token")
 
-def get_api_key(api_key: str = Security(api_key_cookie)):
-    if api_key != "secure":
+def get_api_key(db: Session = Depends(get_db), api_key: str = Security(api_key_cookie)):
+    if not verify_token(api_key, db):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
@@ -19,25 +22,29 @@ def get_api_key(api_key: str = Security(api_key_cookie)):
 router = APIRouter(prefix="/v1", dependencies=[Depends(get_api_key)])
 templates = Jinja2Templates(directory="templates")
 
-db = DB()
-db.init_db()
-
-
 @router.post("/add-swimmer", response_class=HTMLResponse)
-async def api_add_swimmer(request: Request, full_name: Annotated[Union[str, None], Header(alias="HX-Prompt")] = None, hx_request: Annotated[Union[str, None], Header(alias="HX-Request")] = None):
+async def api_add_swimmer(
+    request: Request,
+    db: Session = Depends(get_db),
+    full_name: Annotated[Union[str, None], Header(alias="HX-Prompt")] = None,
+    hx_request: Annotated[Union[str, None], Header(alias="HX-Request")] = None
+):
     if hx_request:
         swimmer = swimrankings.get_swimmer(full_name)
 
         if swimmer:
-            db.insert_into(
-                'scwr_swimmers',
-                'sw_id, birth_year, first_name, last_name, gender',
-                f"{swimmer[0]},{swimmer[1]},'{swimmer[2]}','{swimmer[3]}',{swimmer[4]}"
+            swimmer = ClubSwimmer(
+                sw_id = int(swimmer[0]),
+                birth_year = int(swimmer[1]),
+                first_name = swimmer[2],
+                last_name = swimmer[3],
+                gender = int(swimmer[4])
             )
-
+            db.add(swimmer)
             db.commit()
 
-            swimmers = db.get_all_from('scwr_swimmers')
+            stmt = select(ClubSwimmer)
+            swimmers = db.execute(stmt).scalars().all()
             return templates.TemplateResponse(
                 request=request, name="htmx/admin_view_db.html", context = {"swimmers": swimmers}
             )
@@ -45,43 +52,61 @@ async def api_add_swimmer(request: Request, full_name: Annotated[Union[str, None
             return RedirectResponse('/admin/view-db', status_code=302)
 
 @router.post("/remove-swimmer", response_class=HTMLResponse)
-async def api_remove_swimmer(request: Request, first_name: Annotated[Union[str, None], Header(alias="HX-Prompt")] = None, hx_request: Annotated[Union[str, None], Header(alias="HX-Request")] = None):
+async def api_remove_swimmer(
+    request: Request,
+    db: Session = Depends(get_db),
+    first_name: Annotated[Union[str, None], Header(alias="HX-Prompt")] = None,
+    hx_request: Annotated[Union[str, None], Header(alias="HX-Request")] = None
+):
     if hx_request:
-        db.delete_from('scwr_swimmers', f'first_name = {first_name}')
+        stmt = select(ClubSwimmer).filter_by(first_name=first_name)
+        swimmer = db.execute(stmt).scalar_one_or_none()
+        db.delete(swimmer)
         db.commit()
 
-        swimmers = db.get_all_from('scwr_swimmers')
+        swimmers = db.query(ClubSwimmer).all()
         return templates.TemplateResponse(
             request=request, name="htmx/admin_view_db.html", context = {"swimmers": swimmers}
         )
 
 
 @router.post("/sync-swimmers", response_class=HTMLResponse)
-async def api_sync_swimmers(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
+async def api_sync_swimmers(
+    request: Request,
+    db: Session = Depends(get_db),
+    hx_request: Annotated[Union[str, None], Header()] = None
+):
     swimmers = swimrankings.get_scwr_swimmers()
     if swimmers:
         for swimmer in swimmers:
-            db_swimmer = db.get_all_from('scwr_swimmers', sql_filter=f'sw_id = {swimmer[0]}')
+            stmt = select(ClubSwimmer).filter_by(sw_id=swimmer[0])
+            db_swimmer = db.execute(stmt).scalar_one_or_none()
             if not db_swimmer:
-                db.insert_into(
-                    'scwr_swimmers',
-                    'sw_id, birth_year, first_name, last_name, gender',
-                    f"{swimmer[0]}, {swimmer[1]}, '{swimmer[2]}', '{swimmer[3]}', {swimmer[4]}"
+                swimmer = ClubSwimmer(
+                    sw_id = int(swimmer[0]),
+                    birth_year = int(swimmer[1]),
+                    first_name = swimmer[2],
+                    last_name = swimmer[3],
+                    gender = int(swimmer[4])
                 )
-        
-        sw_ids = ''
-        for i in range(len(swimmers)):
-            swimmer = swimmers[i]
-            if i != len(swimmers) - 1:
-                sw_ids += f'{swimmer[0]},'
-                continue
-            sw_ids += f'{swimmer[0]}'
 
-        db.delete_from('scwr_swimmers', f'sw_id NOT IN ({sw_ids})')
+                db.add(swimmer)
+                db.commit()
+        
+        # wish there was a cleaner way of doing this
+        sw_ids = []
+        for swimmer in swimmers:
+            sw_ids.append(swimmer[0])
+
+        stmt = select(ClubSwimmer).filter(ClubSwimmer.sw_id.not_in(sw_ids))
+        swimmers = db.execute(stmt).scalars().all()
+        db.delete(swimmers)
         db.commit()
 
+
     if hx_request:
-        swimmers = db.get_all_from('scwr_swimmers')
+        stmt = select(ClubSwimmer)
+        swimmers = db.execute(stmt).scalars().all()
         return templates.TemplateResponse(
             request=request, name="htmx/admin_view_db.html", context = {"swimmers": swimmers}
         )

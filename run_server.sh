@@ -1,9 +1,9 @@
 #!/bin/bash
 
-source .venv/bin/activate
-
 fastapi dev app.py --host 0.0.0.0 &
 PID=$!
+
+sleep 3s
 
 if command -v xdg-open > /dev/null; then
 		xdg-open http://localhost:8000/
@@ -13,6 +13,6 @@ else
 		echo "Please manually open http://localhost:8000/"
 fi
 
-trap 'echo "Interrupted. Stopping Fastapi Server..."; kill $PID; exit' INT
+trap 'echo "Interrupted. Stopping Fastapi Server..."; kill $PID; wait $PID 2>/dev/null; clear; exit' INT
 
 wait $PID
