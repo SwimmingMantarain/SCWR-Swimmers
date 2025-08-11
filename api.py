@@ -70,11 +70,11 @@ async def api_add_swimmer(
 
         if swimmer:
             swimmer = ClubSwimmer(
-                sw_id = int(swimmer[0]),
-                birth_year = int(swimmer[1]),
-                first_name = swimmer[2],
-                last_name = swimmer[3],
-                gender = int(swimmer[4])
+                sw_id = swimmer.sw_id,
+                birth_year = swimmer.birth_year,
+                first_name = swimmer.first_name,
+                last_name = swimmer.last_name,
+                gender = swimmer.gender
             )
             db.add(swimmer)
             db.commit()
