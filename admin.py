@@ -25,6 +25,16 @@ TOKEN_LIFETIME = timedelta(hours=1)
 COOKIE_MAX_AGE = int(TOKEN_LIFETIME.total_seconds())
 
 def verify_token(token_str: Optional[str], db: Session) -> bool:
+    """
+    Check whether an access token exists and is not expired.
+
+    Args:
+        token_str (Optional[str]): The access token string to verify.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        bool: True if the token exists and is still valid, False otherwise.
+    """
     if not token_str:
         return False
     
@@ -43,7 +53,12 @@ def verify_token(token_str: Optional[str], db: Session) -> bool:
 
     return True
 
-@router.post("/admin", response_class=HTMLResponse)
+@router.post(
+    "/admin",
+    response_class=HTMLResponse,
+    summary='Login a user to the admin page',
+    description='Checks whether a user still has a valid cookie'
+)
 async def admin_login_post(
     request: Request,
     db: Session = Depends(get_db),
@@ -78,7 +93,12 @@ async def admin_login_post(
     )
 
 
-@router.get("/admin", response_class=HTMLResponse)
+@router.get(
+    "/admin",
+    response_class=HTMLResponse,
+    summary='Return the admin login page',
+    description='What more can I say?'
+)
 async def admin_login(request: Request, db: Session = Depends(get_db)):
     token = request.cookies.get("access_token")
 
@@ -90,7 +110,12 @@ async def admin_login(request: Request, db: Session = Depends(get_db)):
         request=request, name="admin/login.html"
     )
 
-@router.get("/admin/view-db", response_class=HTMLResponse)
+@router.get(
+    "/admin/view-db",
+    response_class=HTMLResponse,
+    summary='Returns the view of the database',
+    description='What more can I say?'
+)
 async def admin_view_db(
     request: Request,
     db: Session = Depends(get_db),
