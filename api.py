@@ -5,6 +5,8 @@ from fastapi.security.api_key import APIKeyCookie
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from typing import Union, Annotated
+
+from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 from db import ClubSwimmer, get_db
 from admin import verify_token
 import swimrankings
@@ -51,7 +53,20 @@ async def api_add_swimmer(
     hx_request: Annotated[Union[str, None], Header(alias="HX-Request")] = None
 ):
     if hx_request:
-        swimmer = swimrankings.get_swimmer(full_name)
+        swimmer = None
+        try:
+            if full_name:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="No name provided"
+                )
+            swimmer = swimrankings.get_swimmer(full_name)
+        except RuntimeError as e:
+            print(e)
+            raise HTTPException(
+                status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to scrape swimrankings.net"
+            )
 
         if swimmer:
             swimmer = ClubSwimmer(
@@ -107,7 +122,14 @@ async def api_sync_swimmers(
     db: Session = Depends(get_db),
     hx_request: Annotated[Union[str, None], Header()] = None
 ):
-    swimmers = swimrankings.get_scwr_swimmers()
+    try:
+        swimmers = swimrankings.get_scwr_swimmers()
+    except RuntimeError as e:
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to scrape swimrankings"
+        )
     if swimmers:
         for swimmer in swimmers:
             stmt = select(ClubSwimmer).filter_by(sw_id=swimmer[0])
