@@ -17,16 +17,16 @@
 				{% if swimmers %}
 						{% for swimmer in swimmers %}
 								<tr>
-										<td>{% if swimmer[1] %}
-												<a href="https://www.swimrankings.net/index.php?page=athleteDetail&athleteId={{ swimmer[1] }}" target="_blank" rel="noopener noreferrer">{{ swimmer[1] }}</a>
+										<td>{% if swimmer.sw_id %}
+												<a href="https://www.swimrankings.net/index.php?page=athleteDetail&athleteId={{ swimmer.sw_id }}" target="_blank" rel="noopener noreferrer">{{ swimmer.sw_id }}</a>
 												{% else %}
 												{{ '-'}}
 												{% endif %}
 										</td>
-										<td>{{ swimmer[2] }}</td>
-										<td>{{ swimmer[3] }}</td>
-										<td>{{ swimmer[4] }}</td>
-										<td>{{ swimmer[5] }}</td>
+										<td>{{ swimmer.birth_year }}</td>
+										<td>{{ swimmer.first_name }}</td>
+										<td>{{ swimmer.last_name }}</td>
+										<td>{{ swimmer.gender }}</td>
 								</tr>
 						{% endfor %}
 				{% endif %}

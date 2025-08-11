@@ -3,13 +3,12 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.security.api_key import APIKeyCookie
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, delete
+from swimrankings import SwimrankingsScraper, get_scraper
 from typing import Union, Annotated
-
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 from db import ClubSwimmer, get_db
 from admin import verify_token
-import swimrankings
 
 api_key_cookie = APIKeyCookie(name="access_token")
 
@@ -49,6 +48,7 @@ templates = Jinja2Templates(directory="templates")
 async def api_add_swimmer(
     request: Request,
     db: Session = Depends(get_db),
+    scraper: SwimrankingsScraper = Depends(get_scraper),
     full_name: Annotated[Union[str, None], Header(alias="HX-Prompt")] = None,
     hx_request: Annotated[Union[str, None], Header(alias="HX-Request")] = None
 ):
@@ -60,7 +60,7 @@ async def api_add_swimmer(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="No name provided"
                 )
-            swimmer = swimrankings.get_swimmer(full_name)
+            swimmer = await scraper.get_swimmer(str(full_name))
         except RuntimeError as e:
             print(e)
             raise HTTPException(
@@ -120,10 +120,11 @@ async def api_remove_swimmer(
 async def api_sync_swimmers(
     request: Request,
     db: Session = Depends(get_db),
+    scraper: SwimrankingsScraper = Depends(get_scraper),
     hx_request: Annotated[Union[str, None], Header()] = None
 ):
     try:
-        swimmers = swimrankings.get_scwr_swimmers()
+        swimmers = await scraper.get_scwr_swimmers()
     except RuntimeError as e:
         print(e)
         raise HTTPException(
@@ -132,15 +133,15 @@ async def api_sync_swimmers(
         )
     if swimmers:
         for swimmer in swimmers:
-            stmt = select(ClubSwimmer).filter_by(sw_id=swimmer[0])
+            stmt = select(ClubSwimmer).filter_by(sw_id=swimmer.sw_id)
             db_swimmer = db.execute(stmt).scalar_one_or_none()
             if not db_swimmer:
                 swimmer = ClubSwimmer(
-                    sw_id = int(swimmer[0]),
-                    birth_year = int(swimmer[1]),
-                    first_name = swimmer[2],
-                    last_name = swimmer[3],
-                    gender = int(swimmer[4])
+                    sw_id = swimmer.sw_id,
+                    birth_year = swimmer.birth_year,
+                    first_name = swimmer.first_name,
+                    last_name = swimmer.last_name,
+                    gender = swimmer.gender.value
                 )
 
                 db.add(swimmer)
@@ -149,11 +150,13 @@ async def api_sync_swimmers(
         # wish there was a cleaner way of doing this
         sw_ids = []
         for swimmer in swimmers:
-            sw_ids.append(swimmer[0])
+            sw_ids.append(swimmer.sw_id)
 
         stmt = select(ClubSwimmer).filter(ClubSwimmer.sw_id.not_in(sw_ids))
         swimmers = db.execute(stmt).scalars().all()
-        db.delete(swimmers)
+
+        stmt = delete(ClubSwimmer).where(ClubSwimmer.sw_id.not_in(sw_ids))
+        db.execute(stmt)
         db.commit()
 
 
