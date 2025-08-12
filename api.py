@@ -4,11 +4,12 @@ from fastapi.templating import Jinja2Templates
 from fastapi.security.api_key import APIKeyCookie
 from sqlalchemy.orm import Session
 from sqlalchemy import select, delete
-from swimrankings import SwimrankingsScraper, get_scraper
 from typing import Union, Annotated
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 from db import ClubSwimmer, get_db
 from admin import verify_token
+from scraper import swimrankings
+from scraper.swimrankings import SwimrankingsScraper
 
 api_key_cookie = APIKeyCookie(name="access_token")
 
@@ -48,19 +49,19 @@ templates = Jinja2Templates(directory="templates")
 async def api_add_swimmer(
     request: Request,
     db: Session = Depends(get_db),
-    scraper: SwimrankingsScraper = Depends(get_scraper),
+    scraper: SwimrankingsScraper = Depends(swimrankings.get_scraper),
     full_name: Annotated[Union[str, None], Header(alias="HX-Prompt")] = None,
     hx_request: Annotated[Union[str, None], Header(alias="HX-Request")] = None
 ):
     if hx_request:
         swimmer = None
         try:
-            if full_name:
+            if not full_name:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="No name provided"
                 )
-            swimmer = await scraper.get_swimmer(str(full_name))
+            swimmer = await scraper.fetch_athlete(str(full_name))
         except RuntimeError as e:
             print(e)
             raise HTTPException(
@@ -120,11 +121,11 @@ async def api_remove_swimmer(
 async def api_sync_swimmers(
     request: Request,
     db: Session = Depends(get_db),
-    scraper: SwimrankingsScraper = Depends(get_scraper),
+    scraper: SwimrankingsScraper = Depends(swimrankings.get_scraper),
     hx_request: Annotated[Union[str, None], Header()] = None
 ):
     try:
-        swimmers = await scraper.get_scwr_swimmers()
+        swimmers = await scraper.fetch_club_athletes()
     except RuntimeError as e:
         print(e)
         raise HTTPException(

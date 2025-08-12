@@ -34,15 +34,5 @@
 </div>
 
 <dialog id="swimmer-pbs">
-		<label for="swimmer_id">Swimmer's Name</label>
-		<select name="swimmer_id" id="swimmer_id" hx-post="/v1/get-swimmer-pbs" hx-trigger="change" hx-target="#pb-container" hx-swap="innerHTML">
-				{% if swimmers %}
-						{% for swimmer in swimmers %}
-								<option value="{{ swimmer[0] }}">{{ swimmer[3] }} {{ swimmer[4] }}</option>
-						{% endfor %}
-				{% endif %}
-		</select>
-		<div id="pb-container">
-
-		</div>
+		<p>W.I.P.</p>
 </dialog>
