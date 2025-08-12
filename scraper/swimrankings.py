@@ -188,7 +188,7 @@ class SwimrankingsScraper(BaseScraper):
         row = table.find('tr', attrs={'class': 'athleteSearch0'})
 
         if row is None:
-            raise HTMLParsingError("Failed to findf required html! Tag `tr`, `class`: `athleteSearch0`")
+            raise HTMLParsingError("Failed to find required html! Tag `tr`, `class`: `athleteSearch0`")
         
         athlete = self._parse_athlete_row(row, Gender(1))
 
