@@ -153,7 +153,11 @@ class SwimrankingsScraper(BaseScraper):
             event_str = a_event.get_text()
 
             event_href = a_event.get('href')
-            style_id = int(re.search(r'(\d+)$', event_href).group(1))
+            style_re = re.search(r'(\d+)$', event_href)
+            if not style_re:
+                raise HTMLParsingError(f"Failed to parse style id from event_href: {event_href}")
+
+            style_id = int(style_re.group(1))
 
             td_course = row.find('td', attrs={'class': 'course'})
 
@@ -161,7 +165,12 @@ class SwimrankingsScraper(BaseScraper):
                 raise HTMLParsingError("Failed to find required html! Tag: `td`, `class`: `course`")
 
             course_text = td_course.get_text()
-            course = int(re.search(r'(\d{2})', course_text).group(1))
+            course_re = re.search(r'(\d{2})', course_text)
+
+            if not course_re:
+                raise HTMLParsingError(f"Failed to parse course from course_text: {course_text}")
+
+            course = int(course_re.group(1))
 
             td_time = row.find('td', attrs={"class": "time"})
 

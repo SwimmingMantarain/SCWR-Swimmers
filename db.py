@@ -47,7 +47,12 @@ class ClubSwimmer(Base):
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     gender = Column(Integer, nullable=False)  # 0: man, 1: woman
-    pbs = relationship('ClubSwimmerPb', back_populates='athlete')
+    pbs = relationship(
+        'ClubSwimmerPb',
+        back_populates='athlete',
+        cascade='all, delete-orphan',
+        passive_deletes=True
+    )
 
 class ClubSwimmerPb(Base):
     """
@@ -72,7 +77,7 @@ class ClubSwimmerPb(Base):
     __tablename__ = 'athlete_pbs'
 
     id = Column(Integer, primary_key=True)
-    athlete_id = Column(Integer, ForeignKey('scwr_swimmers.id'), nullable=False)
+    athlete_id = Column(Integer, ForeignKey('scwr_swimmers.id', ondelete="CASCADE"), nullable=False)
     sw_style_id = Column(Integer, nullable=False)
     sw_result_id = Column(Integer, nullable=False)
     sw_meet_id = Column(Integer, nullable=False)

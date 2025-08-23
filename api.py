@@ -155,12 +155,10 @@ async def api_remove_athlete(
         stmt = select(ClubSwimmer).filter_by(id=swimmer_id)
         swimmer = db.execute(stmt).scalar_one_or_none()
 
-        stmt = select(ClubSwimmerPb).filter_by(athlete_id=swimmer.id)
-        pbs = db.execute(stmt).scalars().all()
+        if swimmer is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Athlete not found")
 
-        for pb in pbs:
-            db.delete(pb)
-
+        db.execute(delete(ClubSwimmerPb).filter_by(athlete_id=swimmer.id))
         db.delete(swimmer)
         db.commit()
 
