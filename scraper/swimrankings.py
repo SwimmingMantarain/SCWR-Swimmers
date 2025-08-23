@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import AsyncGenerator
 from datetime import datetime, timezone, time, date
 from .base_scraper import BaseScraper, DataNotFoundError, HTMLParsingError
+import re
 
 class Gender(Enum):
     MALE = 0
@@ -152,14 +153,15 @@ class SwimrankingsScraper(BaseScraper):
             event_str = a_event.get_text()
 
             event_href = a_event.get('href')
-            style_id = int(event_href[46:])
+            style_id = int(re.search(r'(\d+)$', event_href).group(1))
 
             td_course = row.find('td', attrs={'class': 'course'})
 
             if not td_course:
                 raise HTMLParsingError("Failed to find required html! Tag: `td`, `class`: `course`")
 
-            course = int(td_course.get_text()[:2])
+            course_text = td_course.get_text()
+            course = int(re.search(r'(\d{2})', course_text).group(1))
 
             td_time = row.find('td', attrs={"class": "time"})
 
@@ -182,10 +184,7 @@ class SwimrankingsScraper(BaseScraper):
                 raise HTMLParsingError("Failed to find required html! Tag: `td`, `class`: `code`")
 
             points_text = td_points.get_text()
-            if points_text != '-':
-                points = int(points_text)
-            else:
-                points = 0
+            points = int(points_text) if points_text != '-' else 0
 
             td_date = row.find('td', attrs={"class": "date"})
 
@@ -208,9 +207,8 @@ class SwimrankingsScraper(BaseScraper):
             city_str = a_city.get_text()
 
             city_href = a_city.get('href')
-            meet_id = int(city_href[24:30])
-
-            meet_name = a_city.get('title')
+            meet_id = int(re.search(r'(\d+)$', city_href).group(1))
+            meet_name = a_city.get('title') or city_str
 
             pb = SwimmerPb(
                 style_id,
@@ -339,7 +337,7 @@ class SwimrankingsScraper(BaseScraper):
         if not select:
             raise HTMLParsingError("Failed to find required html! Tag `select`, `name`: `points`")
 
-        default_option = select.find('option', attrs={"selected": ""})
+        default_option = select.find('option', selected=True)
 
         if not default_option:
             raise HTMLParsingError("Failed to find required html! Tag `option`, `selected`: ``")

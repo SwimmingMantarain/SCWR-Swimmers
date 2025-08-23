@@ -2,7 +2,7 @@
 		<h1>Banana DB</h1>
 		<div class="button-board">
 				<button hx-post="/v1/sync-swimmers" hx-trigger="click" hx-target="#content" hx-swap="innerHTML swap:0.8s">Sync Athletes</button>
-				<button hx-post="/v1/add-swimmer" hx-prompt="Swimmer's First, Last name (comma seperated)" hx-target="#content" hx-swap="innerHTML swap:0.8s">Add Athlete</button>
+				<button hx-post="/v1/add-swimmer" hx-prompt="Swimmer's First, Last name (comma separated)" hx-target="#content" hx-swap="innerHTML swap:0.8s">Add Athlete</button>
 				<button hx-get="/admin/frag/remove-athlete-form" hx-target="#modal" hx-swap="innerHTML">Remove Athlete</button>
 				<button hx-get="/admin/frag/view-pb-form" hx-target="#modal" hx-swap="innerHTML">Swimmer Pbs</button>
 		</div>

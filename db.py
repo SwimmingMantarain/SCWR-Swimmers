@@ -55,14 +55,14 @@ class ClubSwimmerPb(Base):
 
     Atributes:
         id (int): Unique primary key
-        athlete_id (int): A foreign key to the swimmmer in the `scwr_swimmers` table this pb belongs to.
+        athlete_id (int): Foreign key to the swimmmer in `scwr_swimmers` this PB belongs to.
         sw_style_id (int): Unique style ID from swimrankings.net
         sw_result_id (int): Unique race result ID from swimrankings.net
         sw_meet_id (int): Unique meet ID from swimrankings.net
         sw_default_fina (str): Default scoring used by swimrankings.net when this was scraped (As of development its FINA 2024)
         event (str): String of the event (distance(m) stroke)
-        course (int): The course the pb was swam in. Either 0 -> 25m or 1 -> 50m.
-        time (int): The pb itself.
+        course (int): Course length in meters (0 for 25m meters, 1 for 50m)
+        time (Time): The PB time
         pts (int): FINA points based on the default swimrankings.net used
         date (Date): Date of the pb.
         city (str): The name of the city the pb was swam in.
@@ -84,7 +84,7 @@ class ClubSwimmerPb(Base):
     date = Column(Date, nullable=False)
     city = Column(String, nullable=False)
     meet_name = Column(String, nullable=False)
-    last_scraped = Column(DateTime, nullable=False)
+    last_scraped = Column(DateTime(timezone=True), nullable=False)
 
     athlete = relationship('ClubSwimmer', back_populates='pbs')
 

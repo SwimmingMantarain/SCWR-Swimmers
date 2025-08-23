@@ -1,4 +1,4 @@
-<label for="name">Swimmer</label>
+<label for="swimmer_id">Swimmer</label>
 <select name="swimmer_id" id="swimmer_id" hx-post="/v1/get-swimmer-pbs" hx-trigger="change" hx-target="#pb-container" hx-swap="innerHTML">
 		{% if swimmers %}
 				{% for swimmer in swimmers %}

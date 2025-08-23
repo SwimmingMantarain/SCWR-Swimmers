@@ -1,1 +1,8 @@
-<h1>Beans</h1>
+<label for="name">Swimmer</label>
+<select name="swimmer_id" id="swimmer_id" hx-post="/v1/remove-athlete" hx-trigger="change" hx-target="#pb-container" hx-swap="innerHTML">
+		{% if swimmers %}
+				{% for swimmer in swimmers %}
+						<option value="{{ swimmer.id }}">{{ swimmer.first_name }} {{ swimmer.last_name }}</option>
+				{% endfor %}
+		{% endif %}
+</select>

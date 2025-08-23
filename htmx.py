@@ -24,6 +24,7 @@ async def htmx_home(request: Request, hx_request: Annotated[Union[str, None], He
         response.headers["Hx-Push-Url"] = "/"
 
         return response
+    return RedirectResponse("/", status_code=302)
 
 @router.get(
     "/page/athletes",
@@ -47,6 +48,7 @@ async def htmx_athletes_page(
         response.headers["HX-Push-Url"] = "/athletes"
 
         return response
+    return RedirectResponse("/", status_code=302)
 
 @router.get(
     "/page/athlete",
@@ -60,19 +62,21 @@ async def htmx_specific_athlete_page(
     db: Session = Depends(get_db),
     hx_request: Annotated[Union[str, None], Header()] = None
 ):
-    stmt = select(ClubSwimmer).filter_by(sw_id=sw_id)
-    swimmer = db.execute(stmt).scalar_one_or_none()
-    if swimmer:
-        if hx_request:
-            response = templates.TemplateResponse(
-                request=request, name="athlete.html", context={'swimmer': swimmer}
-            )
+    if hx_request:
+        stmt = select(ClubSwimmer).filter_by(sw_id=sw_id)
+        swimmer = db.execute(stmt).scalar_one_or_none()
+        if swimmer:
+            if hx_request:
+                response = templates.TemplateResponse(
+                    request=request, name="athlete.html", context={'swimmer': swimmer}
+                )
 
-            response.headers["HX-Push-Url"] = f"/athlete?sw_id={sw_id}"
+                response.headers["HX-Push-Url"] = f"/athlete?sw_id={sw_id}"
 
-            return response
-    else:
-        return RedirectResponse("/athletes", status_code=302)
+                return response
+        else:
+            return RedirectResponse("/athletes", status_code=302)
+    return RedirectResponse("/", status_code=302)
 
 @router.get(
     "/page/records",
@@ -89,6 +93,7 @@ async def htmx_records_page(request: Request, hx_request: Annotated[Union[str, N
         response.headers["Hx-Push-Url"] = "/records"
 
         return response
+    return RedirectResponse("/", status_code=302)
 
 @router.get(
     "/page/meets",
@@ -105,3 +110,4 @@ async def meets_page(request: Request, hx_request: Annotated[Union[str, None], H
         response.headers["HX-Push-Url"] = "/meets"
 
         return response
+    return RedirectResponse("/", status_code=302)
