@@ -1,14 +1,11 @@
-from fastapi import APIRouter, Request, Header, Depends
+from fastapi import APIRouter, Request, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from typing import Annotated, Union
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from db import get_db, ClubSwimmer
 
-
 router = APIRouter()
-
 templates = Jinja2Templates(directory="templates")
 
 @router.get(
@@ -17,11 +14,7 @@ templates = Jinja2Templates(directory="templates")
     summary='Returns the home page',
     description='What more can I say?'
 )
-async def index(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
-    if hx_request:
-        return templates.TemplateResponse(
-            request=request, name="htmx/index.html"
-        )
+async def index(request: Request):
     return templates.TemplateResponse(
         request=request, name="index.html"
     )
@@ -35,39 +28,28 @@ async def index(request: Request, hx_request: Annotated[Union[str, None], Header
 async def athletes_page(
     request: Request,
     db: Session = Depends(get_db),
-    hx_request: Annotated[Union[str, None], Header()] = None
 ):
     stmt = select(ClubSwimmer)
     swimmers = db.execute(stmt).scalars().all()
 
-    if hx_request:
-        return templates.TemplateResponse(
-            request=request, name="htmx/athletes.html", context={'swimmers': swimmers}
-        )
     return templates.TemplateResponse(
         request=request, name="athletes.html", context={'swimmers': swimmers}
     )
 
 @router.get(
-    "/athletes/{swimmer_id}",
+    "/athlete",
     response_class=HTMLResponse,
     summary='Returns portfolio of a specific swimmer',
-    description='Uses the `swimmer_id` to fetch data about that swimmer from the db. If that id isn\'t in the db, user gets redirected back to `/athletes`.'
+    description='Uses the `sw_id` to fetch data about that swimmer from the db. If that id isn\'t in the db, user gets redirected back to `/athletes`.'
 )
 async def specific_athlete_page(
     request: Request,
-    swimmer_id: int,
+    sw_id: int,
     db: Session = Depends(get_db),
-    hx_request: Annotated[Union[str, None], Header()] = None
 ):
-    stmt = select(ClubSwimmer).filter_by(id=swimmer_id)
+    stmt = select(ClubSwimmer).filter_by(sw_id=sw_id)
     swimmer = db.execute(stmt).scalar_one_or_none()
     if swimmer:
-        if hx_request:
-            return templates.TemplateResponse(
-                request=request, name="htmx/athlete.html", context={'swimmer': swimmer}
-            )
-        
         return templates.TemplateResponse(
             request=request, name="athlete.html", context={'swimmer': swimmer}
         )
@@ -81,11 +63,7 @@ async def specific_athlete_page(
     summary='Returns the club records page',
     description='W.I.P.'
 )
-async def records_page(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
-    if hx_request:
-        return templates.TemplateResponse(
-            request=request, name="htmx/records.html"
-        )
+async def records_page(request: Request):
     return templates.TemplateResponse(
         request=request, name="records.html"
     )
@@ -94,13 +72,9 @@ async def records_page(request: Request, hx_request: Annotated[Union[str, None],
     "/meets",
     response_class=HTMLResponse,
     summary='Returns the meets page',
-    description='Displays information about swim meets and competitions.'
+    description='W.I.P.'
 )
-async def meets_page(request: Request, hx_request: Annotated[Union[str, None], Header()] = None):
-    if hx_request:
-        return templates.TemplateResponse(
-            request=request, name="htmx/meets.html"
-        )
+async def meets_page(request: Request):
     return templates.TemplateResponse(
         request=request, name="meets.html"
     )

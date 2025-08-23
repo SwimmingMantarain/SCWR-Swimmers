@@ -149,3 +149,62 @@ async def admin_view_db(
             )
         else:
             return RedirectResponse(url="/admin", status_code=302)
+
+@router.get(
+    "/admin/frag/remove-athlete-form",
+    response_class=HTMLResponse,
+    summary="Returns an html fragment for removing a swimmer from the db",
+    description="What more can I say?"
+)
+async def admin_frag_rm_athlete_form(
+    request: Request,
+    db: Session = Depends(get_db),
+    hx_request: Annotated[Union[str, None], Header()] = None
+):
+    token = request.cookies.get("access_token")
+
+    if hx_request:
+        if verify_token(token, db):
+            stmt = select(ClubSwimmer)
+            swimmers = db.execute(stmt).scalars().all()
+            return templates.TemplateResponse(
+                request=request, name="htmx/admin_rm_athlete_form.html", context = {"swimmers": swimmers}
+            )
+        else:
+            response = templates.TemplateResponse(
+                request=request, name="htmx/admin_login.html"
+            )
+            response.headers["HX-Push-Url"] = "/admin"
+            return response
+    else:
+        return RedirectResponse(url="/admin", status_code=302)
+
+@router.get(
+    "/admin/frag/view-pb-form",
+    response_class=HTMLResponse,
+    summary="Returns an html fragment for viewing a swimmer's pbs from the db",
+    description="What more can I say?"
+)
+async def admin_frag_view_pb_form(
+    request: Request,
+    db: Session = Depends(get_db),
+    hx_request: Annotated[Union[str, None], Header()] = None
+):
+    token = request.cookies.get("access_token")
+
+    if hx_request:
+        if verify_token(token, db):
+            stmt = select(ClubSwimmer)
+            swimmers = db.execute(stmt).scalars().all()
+            return templates.TemplateResponse(
+                request=request, name="htmx/admin_view_pb_form.html", context = {"swimmers": swimmers}
+            )
+        else:
+            response = templates.TemplateResponse(
+                request=request, name="htmx/admin_login.html"
+            )
+            response.headers["HX-Push-Url"] = "/admin"
+            return response
+    else:
+        return RedirectResponse(url="/admin", status_code=302)
+

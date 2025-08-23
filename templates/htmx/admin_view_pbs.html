@@ -1,0 +1,26 @@
+{% if pbs %}
+
+<table id="pb-table">
+		<tbody>
+				<tr>
+						<th>Event</th>
+						<th>Time</th>
+						<th>Date</th>
+						<th>City</th>
+						<th>Meet</th>
+				</tr>
+				{% for pb in pbs %}
+						<tr>
+								<td class="event">{{ pb.event }} ({{ pb.course }}m)</td>
+								<td class="time">{{ pb.time|fmt_time }}</td>
+								<td class="date">{{ pb.date|fmt_date }}</td>
+								<td class="city">{{ pb.city }}</td>
+								<td class="meet">{{ pb.meet_name }}</td>
+						</tr>
+				{% endfor %}
+		</tbody>
+</table>
+
+{% else %}
+<p>No PBs in the Database for this athlete yet!</p>
+{% endif %}

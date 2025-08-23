@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Header, Security, HTTPException, status, Depends
+from fastapi import APIRouter, Request, Header, Security, HTTPException, status, Depends, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.security.api_key import APIKeyCookie
@@ -6,10 +6,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, delete
 from typing import Union, Annotated
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
-from db import ClubSwimmer, get_db
+from db import ClubSwimmer, ClubSwimmerPb, get_db
 from admin import verify_token
 from scraper import swimrankings
 from scraper.swimrankings import SwimrankingsScraper
+from datetime import time, date, datetime
 
 api_key_cookie = APIKeyCookie(name="access_token")
 
@@ -39,6 +40,20 @@ def get_api_key(db: Session = Depends(get_db), api_key: str = Security(api_key_c
 
 router = APIRouter(prefix="/v1", dependencies=[Depends(get_api_key)])
 templates = Jinja2Templates(directory="templates")
+
+def fmt_time(tim_e: time) -> str:
+    if tim_e.hour:
+        return tim_e.strftime("%H:%M:%S.%f")[:-3]
+    elif tim_e.minute:
+        return tim_e.strftime("%M:%S.%f")[:-3]
+    else:
+        return tim_e.strftime("%S.%f")[:-3]
+
+def fmt_date(dat_e: date) -> str:
+    return dat_e.strftime("%d-%m-%Y")
+
+templates.env.filters["fmt_time"] = fmt_time
+templates.env.filters["fmt_date"] = fmt_date
 
 @router.post(
     "/add-swimmer",
@@ -160,9 +175,68 @@ async def api_sync_swimmers(
         stmt = select(ClubSwimmer)
         swimmers = db.execute(stmt).scalars().all()
 
+        for swimmer in swimmers:
+            pbs = await scraper.fetch_athlete_personal_bests(swimmer.sw_id)
+
+            for pb in pbs:
+                swimmer_pb = ClubSwimmerPb(
+                    athlete_id = swimmer.id,
+                    sw_style_id = pb.sw_style_id,
+                    sw_result_id = pb.sw_result_id,
+                    sw_meet_id = pb.sw_meet_id,
+                    sw_default_fina = pb.sw_default_fina,
+                    event = pb.event,
+                    course = pb.course,
+                    time = pb.time,
+                    pts = pb.pts,
+                    date = pb.date,
+                    city = pb.city,
+                    meet_name = pb.meet_name,
+                    last_scraped = pb.last_scraped
+                )
+
+                stmt = select(ClubSwimmerPb).filter_by(sw_result_id=swimmer_pb.sw_result_id)
+                db_pb = db.execute(stmt).scalar_one_or_none()
+
+                if not db_pb:
+                    db.add(swimmer_pb)
+                    db.commit()
+                elif db_pb.sw_result_id != swimmer_pb.sw_result_id:
+                    db.delete(db_pb)
+                    db.add(swimmer_pb)
+                    db.commit()
+                else:
+                    pass
+
     if hx_request:
-        stmt = select(ClubSwimmer)
-        swimmers = db.execute(stmt).scalars().all()
         return templates.TemplateResponse(
             request=request, name="htmx/admin_view_db.html", context = {"swimmers": swimmers}
         )
+
+@router.post(
+    "/get-swimmer-pbs",
+    response_class=HTMLResponse,
+    summary="Returns an html table with the athlete's pbs",
+    description="What more can I say?"
+)
+async def api_athlete_pb_table(
+    request: Request,
+    db: Session = Depends(get_db),
+    swimmer_id: int = Form(...),
+    hx_request: Annotated[Union[str, None], Header()] = None
+):
+    if hx_request:
+        stmt = select(ClubSwimmer).filter_by(id=swimmer_id)
+        swimmer = db.execute(stmt).scalar_one_or_none()
+
+        if swimmer:
+            stmt = select(ClubSwimmerPb).filter_by(athlete_id=swimmer.id)
+            pbs = db.execute(stmt).scalars().all()
+
+            return templates.TemplateResponse(
+                request=request, name="htmx/admin_view_pbs.html", context = {"pbs": pbs}
+            )
+        else:
+            return HTMLResponse(
+                '<script>window.location.href="https://youtu.be/dQw4w9WgXcQ?si=JPPysw3QXTLBs71z"; window.location.reload()</script>'
+            )

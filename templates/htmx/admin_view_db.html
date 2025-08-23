@@ -1,10 +1,10 @@
 <div class="card">
 		<h1>Banana DB</h1>
 		<div class="button-board">
-				<button hx-post="/v1/sync-swimmers" hx-trigger="click" hx-target="#content" hx-swap="innerHTML swap:0.8s">Sync Swimmers</button>
-				<button hx-post="/v1/add-swimmer" hx-prompt="Swimmer's First and Last name (comma seperated)" hx-confirm="Are you BANANA?" hx-target="#content" hx-swap="innerHTML swap:0.8s">Add Swimmer</button>
-				<button hx-post="/v1/remove-swimmer" hx-prompt="Swimmer's First name" hx-confirm="Are you BANANA?" hx-target="#content" hx-swap="innerHTML swap:0.8s">Remove Swimmer</button>
-				<button type="button" onclick="document.getElementById('swimmer-pbs').showModal()">View Swimmer PBs</button>
+				<button hx-post="/v1/sync-swimmers" hx-trigger="click" hx-target="#content" hx-swap="innerHTML swap:0.8s">Sync Athletes</button>
+				<button hx-post="/v1/add-swimmer" hx-prompt="Swimmer's First, Last name (comma seperated)" hx-target="#content" hx-swap="innerHTML swap:0.8s">Add Athlete</button>
+				<button hx-get="/admin/frag/remove-athlete-form" hx-target="#modal" hx-swap="innerHTML">Remove Athlete</button>
+				<button hx-get="/admin/frag/view-pb-form" hx-target="#modal" hx-swap="innerHTML">Swimmer Pbs</button>
 		</div>
 		<table id="swimmers">
 				<tr>
@@ -33,6 +33,5 @@
 		</table>
 </div>
 
-<dialog id="swimmer-pbs">
-		<p>W.I.P.</p>
+<dialog id="modal" hx-on::after-swap="if (!this.open) this.showModal()" onclick="if (event.target === this) this.close()">
 </dialog>

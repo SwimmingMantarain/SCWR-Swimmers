@@ -1,6 +1,6 @@
 from typing import Generator
-from sqlalchemy.orm import declarative_base, sessionmaker, Session
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy.orm import declarative_base, sessionmaker, Session, relationship
+from sqlalchemy import Date, ForeignKey, create_engine, Column, Integer, String, DateTime, Time
 from dotenv import load_dotenv
 import os
 
@@ -29,7 +29,7 @@ class Token(Base):
 
 class ClubSwimmer(Base):
     """
-    Stores primary swimmer data for use in `/athletes` endpoint.
+    Stores primary swimmer data for use in `/athletes` & `/athlete?id=?` endpoints.
 
     Attributes:
         id (int): Unique primary key.
@@ -47,6 +47,46 @@ class ClubSwimmer(Base):
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     gender = Column(Integer, nullable=False)  # 0: man, 1: woman
+    pbs = relationship('ClubSwimmerPb', back_populates='athlete')
+
+class ClubSwimmerPb(Base):
+    """
+    Stores the pbs of a ClubSwimmer scraped from swimrankings.net
+
+    Atributes:
+        id (int): Unique primary key
+        athlete_id (int): A foreign key to the swimmmer in the `scwr_swimmers` table this pb belongs to.
+        sw_style_id (int): Unique style ID from swimrankings.net
+        sw_result_id (int): Unique race result ID from swimrankings.net
+        sw_meet_id (int): Unique meet ID from swimrankings.net
+        sw_default_fina (str): Default scoring used by swimrankings.net when this was scraped (As of development its FINA 2024)
+        event (str): String of the event (distance(m) stroke)
+        course (int): The course the pb was swam in. Either 0 -> 25m or 1 -> 50m.
+        time (int): The pb itself.
+        pts (int): FINA points based on the default swimrankings.net used
+        date (Date): Date of the pb.
+        city (str): The name of the city the pb was swam in.
+        meet_name (str): The name of the meet at which the pb was swum.
+        last_scraped (DateTime): The time and date the last time this pb was scraped for.
+    """
+    __tablename__ = 'athlete_pbs'
+
+    id = Column(Integer, primary_key=True)
+    athlete_id = Column(Integer, ForeignKey('scwr_swimmers.id'), nullable=False)
+    sw_style_id = Column(Integer, nullable=False)
+    sw_result_id = Column(Integer, nullable=False)
+    sw_meet_id = Column(Integer, nullable=False)
+    sw_default_fina = Column(String, nullable=False)
+    event = Column(String, nullable=False)
+    course = Column(Integer, nullable=False)
+    time = Column(Time, nullable=False)
+    pts = Column(Integer, nullable=False)
+    date = Column(Date, nullable=False)
+    city = Column(String, nullable=False)
+    meet_name = Column(String, nullable=False)
+    last_scraped = Column(DateTime, nullable=False)
+
+    athlete = relationship('ClubSwimmer', back_populates='pbs')
 
 engine = create_engine(db_location_env)
 Base.metadata.create_all(engine)
