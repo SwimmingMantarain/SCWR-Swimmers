@@ -4,7 +4,7 @@
 		{% if swimmers %}
 				{% for swimmer in swimmers %}
 					<div class="swimmer-link">
-						<a hx-get="/athletes/{{ swimmer[0] }}" hx-trigger="click" hx-target="#content" hx-swap="innerHTML swap:0.8s" hx-push-url="true">{{ swimmer[3] }} {{ swimmer[4] }}</a>
+						<a hx-get="/htmx/page/athlete?sw_id={{ swimmer.sw_id }}" hx-trigger="click" hx-target="#content" hx-swap="innerHTML swap:0.8s" hx-push-url="true">{{ swimmer.first_name }} {{ swimmer.last_name }}</a>
 					</div>
 				{% endfor %}
 		{% endif %}

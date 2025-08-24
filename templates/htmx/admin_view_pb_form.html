@@ -1,0 +1,12 @@
+<label for="swimmer_id">Swimmer</label>
+<select name="swimmer_id" id="swimmer_id" hx-post="/v1/get-swimmer-pbs" hx-trigger="change" hx-target="#pb-container" hx-swap="innerHTML">
+		{% if swimmers %}
+				{% for swimmer in swimmers %}
+						<option value="{{ swimmer.id }}">{{ swimmer.first_name }} {{ swimmer.last_name }}</option>
+				{% endfor %}
+		{% endif %}
+</select>
+
+<div id="pb-container">
+
+</div>

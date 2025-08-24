@@ -97,9 +97,20 @@ p {
 		margin: 0;
 }
 
-.photo-container {
-		position: relative;
-		margin: 0;
-		padding: 0;
+#modal {
+		width: auto;
+		max-width: 90vw;
+		max-height: 80vh;
+		padding: 1em;
 		border: 2px solid #4a90b8;
+		border-radius: 15px;
+		background: #0a1621;
+		color: #4a90b8;
+		overflow-x: auto;
+		box-sizing: border-box;
+		position: fixed;
+		top: 10px;
+		left: 50%;
+		transform: translateX(-50%);
 }
+

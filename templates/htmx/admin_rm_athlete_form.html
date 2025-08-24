@@ -1,0 +1,15 @@
+<form id="rm-athlete-form"
+	  hx-post="/v1/remove-athlete"
+	  hx-target="#content"
+	  hx-swap="innerHTML swap:0.8s">
+		<label for="swimmer_id">Athlete</label>
+		<select name="swimmer_id" id="swimmer_id" required>
+				<option value="" selected disabled>Choose an athlete…</option>
+				{% if swimmers %}
+				{% for swimmer in swimmers %}
+				<option value="{{ swimmer.id }}">{{ swimmer.first_name }} {{ swimmer.last_name }}</option>
+				{% endfor %}
+				{% endif %}
+		</select>
+		<button type="submit" hx-confirm="Remove this athlete and all PBs?">Remove</button>
+</form>
