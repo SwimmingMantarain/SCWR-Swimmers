@@ -1,5 +1,7 @@
 <form id="rm-athlete-form"
-	  hx-post="/v1/remove-athlete">
+	  hx-post="/v1/remove-athlete"
+	  hx-target="#content"
+	  hx-swap="innerHTML swap:0.8s">
 		<label for="swimmer_id">Athlete</label>
 		<select name="swimmer_id" id="swimmer_id" required>
 				<option value="" selected disabled>Choose an athlete…</option>

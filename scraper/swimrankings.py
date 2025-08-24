@@ -185,7 +185,13 @@ class SwimrankingsScraper(BaseScraper):
             time_str = a_time.get_text()
             timetime = self._parse_time_str(time_str)
 
-            result_id = int(a_time.get("href")[22:])
+            time_href = a_time.get('href')
+            result_id_re = re.search(r'id=(\d+)', time_href)
+
+            if result_id_re is None:
+                raise HTMLParsingError(f"Failed to parse result id from time_href: {time_href}")
+
+            result_id = int(result_id_re.group(1))
 
             td_points = row.find('td', attrs={"class": "code"})
 
@@ -216,7 +222,11 @@ class SwimrankingsScraper(BaseScraper):
             city_str = a_city.get_text()
 
             city_href = a_city.get('href')
-            meet_id = int(re.search(r'(\d+)$', city_href).group(1))
+            meet_id_re = re.search(r'(\d+)$', city_href)
+
+            if meet_id_re is None:
+                raise HTMLParsingError(f"Failed to parse meet id from city_href: {city_href}")
+            meet_id = int(meet_id_re.group(1))
             meet_name = a_city.get('title') or city_str
 
             pb = SwimmerPb(
