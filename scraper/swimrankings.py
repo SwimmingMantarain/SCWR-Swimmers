@@ -153,7 +153,7 @@ class SwimrankingsScraper(BaseScraper):
             event_str = a_event.get_text()
 
             event_href = a_event.get('href')
-            style_re = re.search(r'(\d+)$', event_href)
+            style_re = re.search(r'styleId=(\d+)', event_href)
             if not style_re:
                 raise HTMLParsingError(f"Failed to parse style id from event_href: {event_href}")
 
@@ -222,7 +222,7 @@ class SwimrankingsScraper(BaseScraper):
             city_str = a_city.get_text()
 
             city_href = a_city.get('href')
-            meet_id_re = re.search(r'(\d+)$', city_href)
+            meet_id_re = re.search(r'meetId=(\d+)', city_href)
 
             if meet_id_re is None:
                 raise HTMLParsingError(f"Failed to parse meet id from city_href: {city_href}")

@@ -180,81 +180,85 @@ async def api_sync_swimmers(
     scraper: SwimrankingsScraper = Depends(swimrankings.get_scraper),
     hx_request: Annotated[Union[str, None], Header()] = None
 ):
-    try:
-        swimmers = await scraper.fetch_club_athletes()
-    except RuntimeError as e:
-        print(e)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to scrape swimrankings"
-        )
-    if swimmers:
-        for swimmer in swimmers:
-            stmt = select(ClubSwimmer).filter_by(sw_id=swimmer.sw_id)
-            db_swimmer = db.execute(stmt).scalar_one_or_none()
-            if not db_swimmer:
-                swimmer = ClubSwimmer(
-                    sw_id = swimmer.sw_id,
-                    birth_year = swimmer.birth_year,
-                    first_name = swimmer.first_name,
-                    last_name = swimmer.last_name,
-                    gender = swimmer.gender.value
-                )
+    if hx_request:
+        try:
+            swimmers = await scraper.fetch_club_athletes()
+        except RuntimeError as e:
+            print(e)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to scrape swimrankings"
+            )
+        if swimmers:
+            for swimmer in swimmers:
+                stmt = select(ClubSwimmer).filter_by(sw_id=swimmer.sw_id)
+                db_swimmer = db.execute(stmt).scalar_one_or_none()
+                if not db_swimmer:
+                    swimmer = ClubSwimmer(
+                        sw_id = swimmer.sw_id,
+                        birth_year = swimmer.birth_year,
+                        first_name = swimmer.first_name,
+                        last_name = swimmer.last_name,
+                        gender = swimmer.gender.value
+                    )
 
-                db.add(swimmer)
-                db.commit()
-        
-        # wish there was a cleaner way of doing this
-        sw_ids = []
-        for swimmer in swimmers:
-            sw_ids.append(swimmer.sw_id)
+                    db.add(swimmer)
+                    db.commit()
+            
+            # wish there was a cleaner way of doing this
+            sw_ids = []
+            for swimmer in swimmers:
+                sw_ids.append(swimmer.sw_id)
 
-        stmt = delete(ClubSwimmer).where(ClubSwimmer.sw_id.notin_(sw_ids))
-        db.execute(stmt)
-        db.commit()
-
-        stmt = select(ClubSwimmer)
-        swimmers = db.execute(stmt).scalars().all()
-
-        for swimmer in swimmers:
-            pbs = await scraper.fetch_athlete_personal_bests(swimmer.sw_id)
-
-            for pb in pbs:
-                scraped_pb = ClubSwimmerPb(
-                    athlete_id = swimmer.id,
-                    sw_style_id = pb.sw_style_id,
-                    sw_result_id = pb.sw_result_id,
-                    sw_meet_id = pb.sw_meet_id,
-                    sw_default_fina = pb.sw_default_fina,
-                    event = pb.event,
-                    course = pb.course,
-                    time = pb.time,
-                    pts = pb.pts,
-                    date = pb.date,
-                    city = pb.city,
-                    meet_name = pb.meet_name,
-                    last_scraped = pb.last_scraped
-                )
-
-                stmt = select(ClubSwimmerPb).filter_by(sw_result_id=scraped_pb.sw_result_id)
-                existing = db.execute(stmt).scalar_one_or_none()
-
-                if existing is None:
-                    db.add(scraped_pb)
-                else:
-                    fields = ("athlete_id","sw_style_id","sw_meet_id","sw_default_fina","event",
-                              "course","time","pts","date","city","meet_name","last_scraped")
-
-                    for f in fields:
-                        if getattr(existing, f) != getattr(scraped_pb, f):
-                            setattr(existing, f, getattr(scraped_pb, f))
-
+            stmt = delete(ClubSwimmer).where(ClubSwimmer.sw_id.notin_(sw_ids))
+            db.execute(stmt)
             db.commit()
 
+            stmt = select(ClubSwimmer)
+            swimmers = db.execute(stmt).scalars().all()
 
-    if hx_request:
-        return templates.TemplateResponse(
-            request=request, name="htmx/admin_view_db.html", context = {"swimmers": swimmers}
+            for swimmer in swimmers:
+                pbs = await scraper.fetch_athlete_personal_bests(swimmer.sw_id)
+
+                for pb in pbs:
+                    scraped_pb = ClubSwimmerPb(
+                        athlete_id = swimmer.id,
+                        sw_style_id = pb.sw_style_id,
+                        sw_result_id = pb.sw_result_id,
+                        sw_meet_id = pb.sw_meet_id,
+                        sw_default_fina = pb.sw_default_fina,
+                        event = pb.event,
+                        course = pb.course,
+                        time = pb.time,
+                        pts = pb.pts,
+                        date = pb.date,
+                        city = pb.city,
+                        meet_name = pb.meet_name,
+                        last_scraped = pb.last_scraped
+                    )
+
+                    stmt = select(ClubSwimmerPb).filter_by(sw_result_id=scraped_pb.sw_result_id)
+                    existing = db.execute(stmt).scalar_one_or_none()
+
+                    if existing is None:
+                        db.add(scraped_pb)
+                    else:
+                        fields = ("athlete_id","sw_style_id","sw_meet_id","sw_default_fina","event",
+                                  "course","time","pts","date","city","meet_name","last_scraped")
+
+                        for f in fields:
+                            if getattr(existing, f) != getattr(scraped_pb, f):
+                                setattr(existing, f, getattr(scraped_pb, f))
+
+                db.commit()
+
+
+            return templates.TemplateResponse(
+                request=request, name="htmx/admin_view_db.html", context = {"swimmers": swimmers}
+            )
+    else:
+        return RedirectResponse(
+            "/", status_code=status.HTTP_403_FORBIDDEN
         )
 
 @router.post(
