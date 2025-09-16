@@ -10,7 +10,7 @@ from db import ClubSwimmer, ClubSwimmerPb, get_db
 from admin import verify_token
 from scraper import swimrankings
 from scraper.swimrankings import SwimrankingsScraper
-from datetime import time, date, datetime
+from util import fmt_time, fmt_date
 
 api_key_cookie = APIKeyCookie(name="access_token")
 
@@ -40,17 +40,6 @@ def get_api_key(db: Session = Depends(get_db), api_key: str = Security(api_key_c
 
 router = APIRouter(prefix="/v1", dependencies=[Depends(get_api_key)])
 templates = Jinja2Templates(directory="templates")
-
-def fmt_time(tim_e: time) -> str:
-    if tim_e.hour:
-        return tim_e.strftime("%H:%M:%S.%f")[:-3]
-    elif tim_e.minute:
-        return tim_e.strftime("%M:%S.%f")[:-3]
-    else:
-        return tim_e.strftime("%S.%f")[:-3]
-
-def fmt_date(dat_e: date) -> str:
-    return dat_e.strftime("%d-%m-%Y")
 
 templates.env.filters["fmt_time"] = fmt_time
 templates.env.filters["fmt_date"] = fmt_date

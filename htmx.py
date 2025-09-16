@@ -5,9 +5,13 @@ from typing import Annotated, Union
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from db import get_db, ClubSwimmer
+from api import fmt_time, fmt_date
 
 router = APIRouter(prefix="/htmx")
 templates = Jinja2Templates(directory='templates/htmx')
+
+templates.env.filters["fmt_time"] = fmt_time
+templates.env.filters["fmt_date"] = fmt_date
 
 @router.get(
     "/page/home",

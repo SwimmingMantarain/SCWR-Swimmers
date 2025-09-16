@@ -1,19 +1,19 @@
 /* static/css/index.css */
 
 @font-face {
-  font-family: 'Omniface Regular';
-  src: url('/static/font/omniface-demo.otf');
+		font-family: 'Omniface Regular';
+		src: url('/static/font/omniface-demo.otf');
 }
 
 #header-logo {
-  max-width: 300px;
-  height: auto;
-  margin: 0;
+		max-width: 300px;
+		height: auto;
+		margin: 0;
 }
 
 div#logo-wrapper {
-	margin-block-start: 0 !important;
-	cursor: pointer;
+		margin-block-start: 0 !important;
+		cursor: pointer;
 }
 
 a {
@@ -28,58 +28,93 @@ a:hover {
 }
 
 h1 {
-	display: grid;
-	margin: 0;
-	justify-content: center;
-	color: #4a90b8;
-	font-family: 'Omniface Regular', sans-serif;
+		display: grid;
+		margin: 0;
+		justify-content: center;
+		color: #4a90b8;
+		font-family: 'Omniface Regular', sans-serif;
+}
+
+span#subheader {
+		display: flex;
+		justify-content: center;
+		align-items: baseline;
+		gap: 8px;
+		margin: 0 !important;
+		width: 100%;
+}
+
+span#subheader p {
+		margin: 0 !important;
+		font-size: 1.2rem;
+		color: #4a90b8;
+		font-family: 'Omniface Regular', sans-serif;
+		transform: translateY(-3px);
+}
+
+span#subheader img {
+		height: 1.2rem;
+		width: auto;
+}
+
+div#personal-bests {
+		margin-top: 24px;
+		display: flex;
+		justify-content: center;
+		flex-wrap: wrap;
+}
+
+div#personal-bests h1 {
+		font-size: 2.4rem;
 }
 
 .card {
-  position: relative;
-  margin: 0;
-  padding: 0;
-  border: 2px solid #4a90b8;
-  border-radius: 15px;
-  overflow: hidden;
-  cursor: auto;
-  padding: 32.16px;
+		position: relative;
+		margin: 0;
+		padding: 0;
+		border: 2px solid #4a90b8;
+		border-radius: 15px;
+		overflow: hidden;
+		cursor: auto;
+		padding: 32.16px;
+		justify-content: center;
+
 }
 
 .photo-card {
-  position: relative;
-  margin: 0;
-  padding: 0;
-  border: 2px solid #4a90b8;
-  border-radius: 15px;
-  overflow: hidden;
-  user-select: none;
-  cursor: pointer;
+		position: relative;
+		margin: 0;
+		padding: 0;
+		border: 2px solid #4a90b8;
+		border-radius: 15px;
+		overflow: hidden;
+		user-select: none;
+		cursor: pointer;
 }
 
 
 .card-img {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: cover;
+		display: block;
+		width: 100%;
+		height: auto;
+		object-fit: cover;
 }
 
 .card-label {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 10;
-  backdrop-filter: blur(8px);
-  background: rgba(0, 100, 255, 0.25);
-  padding: 6px 8px;
-  border-radius: 10px;
-  font-weight: bold;
-  font-family: 'Omniface Regular', sans-serif;
-  transform: scale(1);
-  transform-origin: center center;
-  will-change: transform;
-  transition: 
+		position: absolute;
+		top: 10px;
+		left: 10px;
+		z-index: 10;
+		backdrop-filter: blur(8px);
+		background: rgba(0, 100, 255, 0.25);
+		padding: 6px 8px;
+		border-radius: 10px;
+		font-weight: bold;
+		font-family: 'Omniface Regular', sans-serif;
+		transform: scale(1);
+		transform-origin: center center;
+		will-change: transform;
+		transition: 
 				top 0.4s cubic-bezier(0.4, 0, 0.2, 1),
 				left 0.4s cubic-bezier(0.4, 0, 0.2, 1),
 				transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -87,30 +122,30 @@ h1 {
 
 .photo-card:hover .card-label,
 .photo-card:focus .card-label {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(2);
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%) scale(2);
 }
 
 .card-label span#special {
-  display: block;
-  transform: translateY(4px);
+		display: block;
+		transform: translateY(4px);
 }
 .card-label span#not-special {
-  display: block;
-  transform: translateY(2px);
+		display: block;
+		transform: translateY(2px);
 }
 
 header {
-  padding: 8px !important;
-  background: #050d15 !important;
-  border-bottom: 2px solid #4a90b8 !important;
+		padding: 8px !important;
+		background: #050d15 !important;
+		border-bottom: 2px solid #4a90b8 !important;
 }
 
 #content {
-  display: grid;
-  row-gap: 5px;
-  padding-top: 1px;
+		display: grid;
+		row-gap: 5px;
+		padding-top: 1px;
 }
 
 #content.htmx-swapping {
@@ -128,23 +163,23 @@ header {
 }
 
 body {
-  background: #0a1621 !important;
+		background: #0a1621 !important;
 }
 
 html {
-  scrollbar-width: thin;
-  scrollbar-color: #1a3a52 #0a1621;
+		scrollbar-width: thin;
+		scrollbar-color: #1a3a52 #0a1621;
 }
 
 #athlete-name-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: baseline;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		align-items: baseline;
 }
 
 .swimmer-link {
-    width: 50%;
-    box-sizing: border-box;
-    text-align: center;
+		width: 50%;
+		box-sizing: border-box;
+		text-align: center;
 }
