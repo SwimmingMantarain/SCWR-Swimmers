@@ -68,6 +68,25 @@ div#personal-bests h1 {
 		font-size: 2.4rem;
 }
 
+.stroke-pb {
+		display: flex;
+		flex-direction: column;
+}
+
+.stroke-pb td, .stroke-pb th {
+		text-align: center;
+		vertical-align: middle;
+}
+
+.ellipsis {
+		white-space: nowrap;      
+		overflow: hidden;         
+		text-overflow: ellipsis;  
+		width: 200px;
+		height: 72.2px;
+		display: block;           
+}
+
 .card {
 		position: relative;
 		margin: 0;
@@ -78,7 +97,7 @@ div#personal-bests h1 {
 		cursor: auto;
 		padding: 32.16px;
 		justify-content: center;
-
+		width: fit-content;
 }
 
 .photo-card {
