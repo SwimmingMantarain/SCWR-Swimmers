@@ -4,9 +4,13 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from db import get_db, ClubSwimmer
+from util import fmt_time, fmt_date
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
+
+templates.env.filters["fmt_time"] = fmt_time
+templates.env.filters["fmt_date"] = fmt_date
 
 @router.get(
     "/",

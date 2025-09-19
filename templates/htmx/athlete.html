@@ -1,5 +1,261 @@
 <div class="card">
 		<h1>{{ swimmer.first_name }} {{ swimmer.last_name }}</h1>
-		<div id="athlete-card">
+		<span id="subheader">
+				<p>{{ swimmer.birth_year }}</p>
+
+				{% if swimmer.gender %}
+				<img src="/static/img/woman.png"/>
+				{% else %}
+				<img src="/static/img/man.png"/>
+				{% endif %}
+		</span>
+		<div id="personal-bests">
+				<h1>Freestyle</h1>
+				<div class="stroke-pb">
+						<table>
+								<tr><th colspan="5">Short Course (25m)</th></tr>
+								<tr>
+										<th scope="col">Event</th>
+										<th scope="col">Time</th>
+										<th scope="col">Date</th>
+										<th scope="col">City</th>
+										<th scope="col">Meet</th>
+								</tr>
+
+								{% for pb in swimmer.pbs %}
+								{% if pb.sw_style_id <= 8 and pb.course == 25 %}
+								<tr>
+										<td class="event">{{ pb.event }}</td>
+										<td class="time">{{ pb.time|fmt_time }}</td>
+										<td class="date">{{ pb.date|fmt_date }}</td>
+										<td class="city">{{ pb.city }}</td>
+										<td class="meet">{{ pb.meet_name }}</td>
+								</tr>
+								{% endif %}
+								{% endfor %}
+						</table>
+						<table>
+
+								<tr><th colspan="5">Long Course (50m)</th></tr>
+								<tr>
+										<th scope="col">Event</th>
+										<th scope="col">Time</th>
+										<th scope="col">Date</th>
+										<th scope="col">City</th>
+										<th scope="col">Meet</th>
+								</tr>
+
+								{% for pb in swimmer.pbs %}
+								{% if pb.sw_style_id <= 8 and pb.course == 50 %}
+								<tr>
+										<td class="event">{{ pb.event }}</td>
+										<td class="time">{{ pb.time|fmt_time }}</td>
+										<td class="date">{{ pb.date|fmt_date }}</td>
+										<td class="city">{{ pb.city }}</td>
+										<td class="meet">{{ pb.meet_name }}</td>
+								</tr>
+								{% endif %}
+								{% endfor %}
+
+						</table>
+				</div>
+				<h1>Backstroke</h1>
+				<div class="stroke-pb">
+						<table>
+								<tr><th colspan="5">Short Course (25m)</th></tr>
+								<tr>
+										<th scope="col">Event</th>
+										<th scope="col">Time</th>
+										<th scope="col">Date</th>
+										<th scope="col">City</th>
+										<th scope="col">Meet</th>
+								</tr>
+
+								{% for pb in swimmer.pbs %}
+								{% if pb.sw_style_id >= 9 and pb.sw_style_id <= 11 and pb.course == 25 %}
+								<tr>
+										<td class="event">{{ pb.event }}</td>
+										<td class="time">{{ pb.time|fmt_time }}</td>
+										<td class="date">{{ pb.date|fmt_date }}</td>
+										<td class="city">{{ pb.city }}</td>
+										<td class="meet">{{ pb.meet_name }}</td>
+								</tr>
+								{% endif %}
+								{% endfor %}
+
+						</table>
+						<table>
+								<tr><th colspan="5">Long Course (50m)</th></tr>
+								<tr>
+										<th scope="col">Event</th>
+										<th scope="col">Time</th>
+										<th scope="col">Date</th>
+										<th scope="col">City</th>
+										<th scope="col">Meet</th>
+								</tr>
+
+								{% for pb in swimmer.pbs %}
+								{% if pb.sw_style_id >= 9 and pb.sw_style_id <= 11 and pb.course == 50 %}
+								<tr>
+										<td class="event">{{ pb.event }}</td>
+										<td class="time">{{ pb.time|fmt_time }}</td>
+										<td class="date">{{ pb.date|fmt_date }}</td>
+										<td class="city">{{ pb.city }}</td>
+										<td class="meet">{{ pb.meet_name }}</td>
+								</tr>
+								{% endif %}
+								{% endfor %}
+
+						</table>
+				</div>
+				<h1>Breaststroke</h1>
+				<div class="stroke-pb">
+
+						<table>
+								<tr><th colspan="5">Short Course (25m)</th></tr>
+								<tr>
+										<th scope="col">Event</th>
+										<th scope="col">Time</th>
+										<th scope="col">Date</th>
+										<th scope="col">City</th>
+										<th scope="col">Meet</th>
+								</tr>
+
+								{% for pb in swimmer.pbs %}
+								{% if pb.sw_style_id >= 12 and pb.sw_style_id <= 14 and pb.course == 25 %}
+								<tr>
+										<td class="event">{{ pb.event }}</td>
+										<td class="time">{{ pb.time|fmt_time }}</td>
+										<td class="date">{{ pb.date|fmt_date }}</td>
+										<td class="city">{{ pb.city }}</td>
+										<td class="meet">{{ pb.meet_name }}</td>
+								</tr>
+								{% endif %}
+								{% endfor %}
+
+						</table>
+						<table>
+								<tr><th colspan="5">Long Course (50m)</th></tr>
+								<tr>
+										<th scope="col">Event</th>
+										<th scope="col">Time</th>
+										<th scope="col">Date</th>
+										<th scope="col">City</th>
+										<th scope="col">Meet</th>
+								</tr>
+
+								{% for pb in swimmer.pbs %}
+								{% if pb.sw_style_id >= 12 and pb.sw_style_id <= 14 and pb.course == 50 %}
+								<tr>
+										<td class="event">{{ pb.event }}</td>
+										<td class="time">{{ pb.time|fmt_time }}</td>
+										<td class="date">{{ pb.date|fmt_date }}</td>
+										<td class="city">{{ pb.city }}</td>
+										<td class="meet">{{ pb.meet_name }}</td>
+								</tr>
+								{% endif %}
+								{% endfor %}
+
+						</table>
+				</div>
+				<h1>Butterfly</h1>
+				<div class="stroke-pb">
+						<table>
+								<tr><th colspan="5">Short Course (25m)</th></tr>
+								<tr>
+										<th scope="col">Event</th>
+										<th scope="col">Time</th>
+										<th scope="col">Date</th>
+										<th scope="col">City</th>
+										<th scope="col">Meet</th>
+								</tr>
+
+								{% for pb in swimmer.pbs %}
+								{% if pb.sw_style_id >= 15 and pb.sw_style_id <= 17 and pb.course == 25 %}
+								<tr>
+										<td class="event">{{ pb.event }}</td>
+										<td class="time">{{ pb.time|fmt_time }}</td>
+										<td class="date">{{ pb.date|fmt_date }}</td>
+										<td class="city">{{ pb.city }}</td>
+										<td class="meet">{{ pb.meet_name }}</td>
+								</tr>
+								{% endif %}
+								{% endfor %}
+
+						</table>
+						<table>
+								<tr><th colspan="5">Long Course (50m)</th></tr>
+								<tr>
+										<th scope="col">Event</th>
+										<th scope="col">Time</th>
+										<th scope="col">Date</th>
+										<th scope="col">City</th>
+										<th scope="col">Meet</th>
+								</tr>
+
+								{% for pb in swimmer.pbs %}
+								{% if pb.sw_style_id >= 15 and pb.sw_style_id <= 17 and pb.course == 50 %}
+								<tr>
+										<td class="event">{{ pb.event }}</td>
+										<td class="time">{{ pb.time|fmt_time }}</td>
+										<td class="date">{{ pb.date|fmt_date }}</td>
+										<td class="city">{{ pb.city }}</td>
+										<td class="meet">{{ pb.meet_name }}</td>
+								</tr>
+								{% endif %}
+								{% endfor %}
+
+						</table>
+				</div>
+				<h1>Medley</h1>
+				<div class="stroke-pb">
+						<table>
+								<tr><th colspan="5">Short Course (25m)</th></tr>
+								<tr>
+										<th scope="col">Event</th>
+										<th scope="col">Time</th>
+										<th scope="col">Date</th>
+										<th scope="col">City</th>
+										<th scope="col">Meet</th>
+								</tr>
+
+								{% for pb in swimmer.pbs %}
+								{% if pb.sw_style_id >= 18 and pb.sw_style_id <= 20 and pb.course == 25 %}
+								<tr>
+										<td class="event">{{ pb.event }}</td>
+										<td class="time">{{ pb.time|fmt_time }}</td>
+										<td class="date">{{ pb.date|fmt_date }}</td>
+										<td class="city">{{ pb.city }}</td>
+										<td class="meet">{{ pb.meet_name }}</td>
+								</tr>
+								{% endif %}
+								{% endfor %}
+
+						</table>
+						<table>
+								<tr><th colspan="5">Long Course (50m)</th></tr>
+								<tr>
+										<th scope="col">Event</th>
+										<th scope="col">Time</th>
+										<th scope="col">Date</th>
+										<th scope="col">City</th>
+										<th scope="col">Meet</th>
+								</tr>
+
+								{% for pb in swimmer.pbs %}
+								{% if pb.sw_style_id >= 18 and pb.sw_style_id <= 20 and pb.course == 50 %}
+								<tr>
+										<td class="event">{{ pb.event }}</td>
+										<td class="time">{{ pb.time|fmt_time }}</td>
+										<td class="date">{{ pb.date|fmt_date }}</td>
+										<td class="city">{{ pb.city }}</td>
+										<td class="meet">{{ pb.meet_name }}</td>
+								</tr>
+								{% endif %}
+								{% endfor %}
+
+						</table>
+				</div>
+
 		</div>
 </div>

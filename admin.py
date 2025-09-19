@@ -8,12 +8,16 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 from db import Token, ClubSwimmer, get_db
 from dotenv import load_dotenv
+from util import fmt_time, fmt_date
 import bcrypt
 import secrets
 import os
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
+
+templates.env.filters["fmt_time"] = fmt_time
+templates.env.filters["fmt_date"] = fmt_date
 
 load_dotenv()
 pw_hash = os.getenv("PASSWORD")
