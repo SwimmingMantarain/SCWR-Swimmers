@@ -1,0 +1,18 @@
+@media only screen and (orientation: portrait) {
+	#header-logo {
+		width: 70%;
+	}
+
+    body {
+        overflow-x: hidden;
+    }
+
+    div.photo-card {
+        width: 95%;
+    }
+    
+    div.photo-card:hover .card-label-wrapper,
+    div.photo-card:focus .card-label-wrapper {
+        transform: translate(-50%, -50%) scale(2);
+    }
+}
