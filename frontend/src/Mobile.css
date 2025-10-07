@@ -4,15 +4,60 @@
 	}
 
     body {
-        overflow-x: hidden;
+        overflow: hidden;
     }
 
-    div.photo-card {
-        width: 95%;
+    div#content {
+        flex-direction: column;
+        height: calc(100vh - 60px);
+        padding: 10px;
+        gap: 10px;
+    }
+
+    div#bottom-row {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+        flex: 2;
+    }
+
+    div#card-center {
+        max-width: 100%;
+        flex: 1;
+    }
+
+    div#bottom-row .photo-card {
+        width: 100%;
+        flex: 1;
     }
     
     div.photo-card:hover .card-label-wrapper,
     div.photo-card:focus .card-label-wrapper {
         transform: translate(-50%, -50%) scale(2);
+    }
+}
+
+@media only screen and (orientation: landscape) and (max-height: 600px) {
+    #header-logo {
+        width: 25%;
+    }
+
+    div#content {
+        height: calc(100vh - 50px);
+        padding: 10px;
+        gap: 10px;
+    }
+
+    header {
+        padding: 4px;
+    }
+
+    span#card-label {
+        font-size: 200%;
+    }
+
+    div.photo-card:hover .card-label-wrapper,
+    div.photo-card:focus .card-label-wrapper {
+        transform: translate(-50%, -50%) scale(3);
     }
 }

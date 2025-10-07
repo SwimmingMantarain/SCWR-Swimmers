@@ -63,10 +63,34 @@ div.photo-card:focus .card-label-wrapper {
 
 div#content {
     display: flex;
-    row-gap: 15px;
-    padding-top: 20px;
     flex-direction: column;
     align-items: center;
+    padding: 20px;
+    gap: 15px;
+    height: calc(100vh - 80px);
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+div#bottom-row {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    width: 100%;
+    justify-content: center;
+    flex: 1;
+    min-height: 0;
+}
+
+div#card-center {
+    flex: 1;
+    width: 100%;
+    max-width: 50%;
+}
+
+div#bottom-row .photo-card {
+    flex: 1;
+    width: 100%;
 }
 
 #root {
