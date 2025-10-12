@@ -1,6 +1,8 @@
 function Athletes() {
     return (
-        <div><p>Poop</p></div>
+        <div id="content">
+            <p>Poop</p>
+        </div>
     )
 }
 
