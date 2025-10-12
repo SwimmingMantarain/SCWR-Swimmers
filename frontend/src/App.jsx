@@ -1,17 +1,21 @@
 import './App.css'
 import './Mobile.css'
 
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+
 // My shtuff
 import Header from "./Header"
+import Athletes from "./Athletes"
 
 function random(length) {
     return Math.floor(Math.random() * length) + 1;
 }
 
-function App() {
+function Home() {
+    const navigate = useNavigate();
+
     return (
         <>
-            <Header />
             <div id="content">
                 <div class="photo-card" id="card-center">
                     <div class="card-label-wrapper">
@@ -24,7 +28,7 @@ function App() {
                         alt="Club Records Image"></img>
                 </div>
                 <div id="bottom-row">
-                    <div class="photo-card">
+                    <div class="photo-card" onClick={() => navigate("/athletes")}>
                         <div class="card-label-wrapper">
                             <span id="card-label">Athletes</span>
                         </div>
@@ -47,6 +51,18 @@ function App() {
                 </div>
             </div>
         </>
+    )
+}
+
+function App() {
+    return (
+        <Router>
+            <Header />
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/athletes" element={<Athletes />} />
+            </Routes>
+        </Router>
     )
 }
 

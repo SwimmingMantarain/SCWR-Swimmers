@@ -1,8 +1,10 @@
-import * as React from "react";
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 
 export default function Header() {
+    const navigate = useNavigate();
+
     return (
-        <header>
+        <header onClick={() => navigate("/")}>
             <div
                 id="header-wrapper"
                 tabIndex={0}

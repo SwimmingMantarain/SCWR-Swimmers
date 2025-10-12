@@ -9,9 +9,10 @@
 
     div#content {
         flex-direction: column;
-        height: calc(100vh - 60px);
         padding: 10px;
         gap: 10px;
+        flex: 1;
+        overflow: hidden;
     }
 
     div#bottom-row {
@@ -19,16 +20,19 @@
         width: 100%;
         gap: 10px;
         flex: 2;
+        min-height: 0;
     }
 
     div#card-center {
         max-width: 100%;
         flex: 1;
+        min-height: 0;
     }
 
     div#bottom-row .photo-card {
         width: 100%;
         flex: 1;
+        min-height: 0;
     }
     
     div.photo-card:hover .card-label-wrapper,
@@ -43,9 +47,10 @@
     }
 
     div#content {
-        height: calc(100vh - 50px);
-        padding: 10px;
-        gap: 10px;
+        padding: 8px;
+        gap: 8px;
+        flex: 1;
+        overflow: hidden;
     }
 
     header {
@@ -53,11 +58,24 @@
     }
 
     span#card-label {
-        font-size: 200%;
+        font-size: 100%;
     }
 
     div.photo-card:hover .card-label-wrapper,
     div.photo-card:focus .card-label-wrapper {
         transform: translate(-50%, -50%) scale(3);
+    }
+    
+    div#bottom-row {
+        gap: 8px;
+        min-height: 0;
+    }
+    
+    div#card-center {
+        min-height: 0;
+    }
+    
+    div#bottom-row .photo-card {
+        min-height: 0;
     }
 }
