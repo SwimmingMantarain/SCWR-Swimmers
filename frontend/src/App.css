@@ -6,6 +6,12 @@
     user-select: none;
 }
 
+#header-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 header {
     padding: 8px 4px 0px 4px;
     border-bottom: 2px solid #83B1D5;

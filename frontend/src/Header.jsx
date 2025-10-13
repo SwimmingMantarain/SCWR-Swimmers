@@ -8,6 +8,7 @@ export default function Header() {
             <div
                 id="header-wrapper"
                 tabIndex={0}
+                className="grid justify-center items-center"
             >
                 <img 
                     id="header-logo" 

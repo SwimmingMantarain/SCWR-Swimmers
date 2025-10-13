@@ -1,9 +1,10 @@
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+
+// My shtuff
 import './App.css'
 import './Mobile.css'
 
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-
-// My shtuff
 import Header from "./Header"
 import Athletes from "./Athletes"
 
