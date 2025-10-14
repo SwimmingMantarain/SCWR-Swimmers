@@ -43,15 +43,19 @@ function Athletes() {
         fetchAthletes();
     }, [api_key]);
 
-    if (loading) return <div id="content">Loading...</div>;
-    if (error) return <div id="content">{error}</div>;
+    if (loading) return (
+        <div id="content">
+            {loading && <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity }}>Loading...</motion.div>}
+        </div>);
+    if (error) return <div id="content">{error && <div className="text-red-500">{error}</div>}</div>;
 
     return (
         <div id="content">
             <motion.h1
-                className="text-5xl font-bold text-center mb-26 text-yellow-400"
+                className="text-5xl font-bold text-center mb-26 text-yellow-400 select-none"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
             >
                 Athletes
             </motion.h1>
@@ -59,11 +63,15 @@ function Athletes() {
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
+                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2"
             >
                 {data.map(athlete => (
                     <motion.li
                         key={athlete.id}
                         variants={itemVariants}
+                        whileHover={{ scale: 1.1, color: '#83B1D5'}}
+                        tranition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                        className="cursor-pointer select-none"
                     >
                         {athlete.first_name} {athlete.last_name}
                     </motion.li>
