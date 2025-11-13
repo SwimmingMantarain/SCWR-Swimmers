@@ -7,6 +7,7 @@ import './Mobile.css'
 
 import Header from "./Header"
 import Athletes from "./Athletes"
+import Athlete from "./Athlete"
 
 function random(length) {
     return Math.floor(Math.random() * length) + 1;
@@ -62,6 +63,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/athletes" element={<Athletes />} />
+                <Route path="/athlete" element={<Athlete />} />
             </Routes>
         </Router>
     )

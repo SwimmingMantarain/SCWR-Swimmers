@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 
@@ -21,6 +22,8 @@ const itemVariants = {
 };
 
 function Athletes() {
+    const navigate = useNavigate();
+
     const api_key = import.meta.env.VITE_APIKEY;
 
     const [data, setData] = useState([]);
@@ -52,7 +55,7 @@ function Athletes() {
     return (
         <div id="content">
             <motion.h1
-                className="text-5xl font-bold text-center mb-26 text-yellow-400 select-none"
+                className="text-7xl font-bold text-center mb-26 text-yellow-400 select-none"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
@@ -63,15 +66,16 @@ function Athletes() {
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2"
+                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5"
             >
-                {data.map(athlete => (
+                {data.map((athlete, index) => (
                     <motion.li
                         key={athlete.id}
                         variants={itemVariants}
-                        whileHover={{ scale: 1.1, color: '#83B1D5'}}
-                        tranition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                        className="cursor-pointer select-none"
+                        whileHover={{ scale: 1.15, color: '#83B1D5'}}
+                        transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+                        className={`cursor-pointer select-none text-2xl`}
+                        onClick={() => navigate(`/athlete?id=${athlete.id}`)}
                     >
                         {athlete.first_name} {athlete.last_name}
                     </motion.li>

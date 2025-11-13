@@ -213,7 +213,7 @@ async def api_sync_swimmers(
 
                     db.add(swimmer)
                     db.commit()
-            
+
             # wish there was a cleaner way of doing this
             sw_ids = []
             for swimmer in swimmers:
@@ -305,10 +305,10 @@ async def api_athlete_pb_table(
     summary="Returns json data of athletes in the database",
     description="TODO: WIP"
 )
-async def api_athlete_endpoint(
-        request: Request,
-        db: Session = Depends(get_db),
-        x_api_key: str = Header(None),
+async def api_athletes_endpoint(
+    request: Request,
+    db: Session = Depends(get_db),
+    x_api_key: str = Header(None),
 ):
     if x_api_key != api_key:
         return {"message" : "¯\\_(ツ)_/¯"}
@@ -317,3 +317,26 @@ async def api_athlete_endpoint(
     swimmers = db.execute(stmt).scalars().all()
 
     return swimmers
+
+@router.get(
+    "/athlete",
+    response_class=JSONResponse,
+    summary="Returns json data for specific athlete",
+    description="TODO: WIP"
+)
+async def api_athlete_endpoint(
+        request: Request,
+        id: int,
+        db: Session = Depends(get_db),
+        x_api_key: str = Header(None),
+):
+    if x_api_key != api_key:
+        return {"message" : "¯\\_(ツ)_/¯"}
+
+    stmt = select(ClubSwimmer).filter_by(id=id)
+    athlete = db.execute(stmt).scalar_one_or_none()
+
+    stmt = select(ClubSwimmerPb).filter_by(athlete_id=athlete.id)
+    athlete_pbs = db.execute(stmt).scalars().all()
+
+    return {"athlete": athlete, "pbs": athlete_pbs}
