@@ -20,7 +20,6 @@ const formatTime = (timeStr) => {
   }
 };
 
-// Utility function to format date
 const formatDate = (dateStr) => {
     if (!dateStr) return '--/--/----';
     const date = new Date(dateStr);
@@ -30,7 +29,6 @@ const formatDate = (dateStr) => {
     return `${day}/${month}/${year}`;
 };
 
-// Group PBs by stroke type
 const groupByStroke = (pbs) => {
     const groups = {};
     
@@ -50,7 +48,6 @@ const groupByStroke = (pbs) => {
         groups[stroke].push(pb);
     });
     
-    // Sort each group by event distance
     Object.keys(groups).forEach(stroke => {
         groups[stroke].sort((a, b) => {
             const distA = parseInt(a.event.match(/\d+/)?.[0] || '0');
@@ -62,7 +59,6 @@ const groupByStroke = (pbs) => {
     return groups;
 };
 
-// Chevron icons
 const ChevronDown = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <polyline points="6 9 12 15 18 9"></polyline>
@@ -187,7 +183,6 @@ function Athlete() {
                 const grouped = groupByStroke(pbs);
                 setGroupedPbs(grouped);
                 
-                // Open all sections by default
                 const initialOpen = {};
                 Object.keys(grouped).forEach(stroke => {
                     initialOpen[stroke] = true;
@@ -234,7 +229,7 @@ function Athlete() {
     return (
         <div className="flex flex-col h-full w-full overflow-hidden">
             <motion.div
-                className="px-4 py-3 md:px-6 md:py-6 border-b-2 border-[#83B1D5] flex-shrink-0"
+                className="px-4 pt-8 pd-2 flex-shrink-0"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
             >

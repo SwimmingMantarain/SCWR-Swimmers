@@ -52,7 +52,7 @@ class UrlBook:
                 f'&season=2025&course=LCM&agegroup=0&stroke=9'
         )
 
-class SwimrankingsScraper(BaseScraper):
+class SwimrankingsWebScraper(BaseScraper):
     def __init__(self):
         super().__init__(UrlBook())
 
@@ -389,6 +389,6 @@ class SwimrankingsScraper(BaseScraper):
     async def fetch_athlete_personal_bests(self, athlete_id: int) -> list[SwimmerPb]:
         return await self._fetch_athlete_pbs(athlete_id)
 
-async def get_scraper() -> AsyncGenerator[SwimrankingsScraper, None]:
-    async with SwimrankingsScraper() as scraper:
+async def get_scraper() -> AsyncGenerator[SwimrankingsWebScraper, None]:
+    async with SwimrankingsWebScraper() as scraper:
         yield scraper

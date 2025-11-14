@@ -8,8 +8,9 @@ from typing import Union, Annotated
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 from db import ClubSwimmer, ClubSwimmerPb, get_db
 from admin import verify_token
-from scraper import swimrankings
-from scraper.swimrankings import SwimrankingsScraper
+from scraper import swimrankings_web, swimrankings_api
+from scraper.swimrankings_web import SwimrankingsWebScraper
+from scraper.swimrankings_api import SwimrankingsApiScraper
 from util import fmt_time, fmt_date
 from dotenv import load_dotenv
 import os
@@ -73,7 +74,7 @@ templates.env.filters["fmt_date"] = fmt_date
 async def api_add_swimmer(
     request: Request,
     db: Session = Depends(get_db),
-    scraper: SwimrankingsScraper = Depends(swimrankings.get_scraper),
+    scraper: SwimrankingsWebScraper = Depends(swimrankings_web.get_scraper),
     full_name: Annotated[Union[str, None], Header(alias="HX-Prompt")] = None,
     hx_request: Annotated[Union[str, None], Header(alias="HX-Request")] = None
 ):
@@ -186,7 +187,7 @@ async def api_remove_athlete(
 async def api_sync_swimmers(
     request: Request,
     db: Session = Depends(get_db),
-    scraper: SwimrankingsScraper = Depends(swimrankings.get_scraper),
+    scraper: SwimrankingsWebScraper = Depends(swimrankings_web.get_scraper),
     hx_request: Annotated[Union[str, None], Header()] = None
 ):
     if hx_request:
@@ -306,7 +307,7 @@ async def api_athlete_pb_table(
     description="TODO: WIP"
 )
 async def api_athletes_endpoint(
-    request: Request,
+    _: Request,
     db: Session = Depends(get_db),
     x_api_key: str = Header(None),
 ):
@@ -325,7 +326,7 @@ async def api_athletes_endpoint(
     description="TODO: WIP"
 )
 async def api_athlete_endpoint(
-        request: Request,
+        _: Request,
         id: int,
         db: Session = Depends(get_db),
         x_api_key: str = Header(None),

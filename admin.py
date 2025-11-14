@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Header, Form, Depends
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -9,6 +9,9 @@ from typing import Optional
 from db import Token, ClubSwimmer, get_db
 from dotenv import load_dotenv
 from util import fmt_time, fmt_date
+from scraper import swimrankings_web, swimrankings_api
+from scraper.swimrankings_web import SwimrankingsWebScraper
+from scraper.swimrankings_api import SwimrankingsApiScraper
 import bcrypt
 import secrets
 import os
@@ -21,6 +24,7 @@ templates.env.filters["fmt_date"] = fmt_date
 
 load_dotenv()
 pw_hash = os.getenv("PASSWORD")
+sw_key = os.getenv("SMAPIKEY")
 if not pw_hash:
     raise RuntimeError("PASSWORD (bcrypt hash) is not set in .env!!!\n")
 pw = pw_hash.encode()
@@ -212,3 +216,25 @@ async def admin_frag_view_pb_form(
     else:
         return RedirectResponse(url="/admin", status_code=302)
 
+@router.post(
+    "/admin/sync-db",
+    response_class=JSONResponse,
+    summary="Triggers full db sync with swimmrankings",
+    description="W.I.P.",
+)
+async def admin_sync_db(
+        request: Request,
+        db: Session = Depends(get_db),
+        hx_request: Annotated[Union[str, None], Header()] = None,
+):
+    token = request.cookies.get("access_token")
+
+    if hx_request:
+        if verify_token(token, db):
+            if sw_key: 
+                scraper = await swimrankings_api.get_scraper(sw_key)
+                await scraper.get_belgium_meets()
+            else: 
+                scraper = swimrankings_web.get_scraper()
+    else:
+        return RedirectResponse(url="/admin", status_code=302)

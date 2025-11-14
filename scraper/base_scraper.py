@@ -53,8 +53,12 @@ class BaseScraper:
         await self.client.aclose()
 
     @rate_limited(1)
-    async def _fetch(self, url: str):
-        response = await self.client.get(url)
+    async def _fetch(self, url: str, api_key: str = ""):
+        headers = {}
+        if api_key:
+            headers["appuserid"] = api_key
+
+        response = await self.client.get(url, headers=headers)
         if response.status_code != 200 or not response.text:
             raise ScrapingError(f"Failed to fetch {url} - status {response.status_code}")
         return response
