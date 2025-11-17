@@ -1,4 +1,6 @@
 from .base_scraper import BaseScraper, ScraperError
+from .swimrankings_types import *
+from datetime import datetime
 
 class UrlBook:
     def __init__(self):
@@ -13,11 +15,28 @@ class SwimrankingsApiScraper(BaseScraper):
         self.key = api_key
         super().__init__(UrlBook())
 
-    async def get_belgium_meets(self):
+    async def get_belgium_meets(self) -> list[Meet]:
         url = self.url_book.belgium_meets()
         resp = await self._fetch(url, self.key)
+        data = resp.json()["splashme"]
 
-        print(resp.json())
+        meets = []
+
+        for country in data:
+            if country["code"] == "BEL":
+                for meet in country["meets"]:
+                    meets.append(Meet(
+                        datetime.strptime(meet["startdate"], "%Y-%m-%d").date(),
+                        datetime.strptime(meet["enddate"], "%Y-%m-%d").date(),
+                        int(meet["liveid"]),
+                        int(meet["id"]),
+                        int(meet["course"]),
+                        datetime.strptime(meet["lastupdate"], "%Y-%m-%dT%H:%M:%S"),
+                        meet["name"],
+                        meet["city"],
+                    ))
+
+        return meets
 
 async def get_scraper(api_key: str = "") -> SwimrankingsApiScraper:
     scraper = SwimrankingsApiScraper(api_key)

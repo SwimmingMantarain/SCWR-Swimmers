@@ -1,0 +1,36 @@
+<div class="card">
+    <h1>Meat DB</h1>
+    <div class="button-board">
+                <button hx-post="/admin/sync-meets" hx-trigger="click" hx-target="#content", hx-swap="innerHTML swap:0.8s">Sync Database</button>
+    </div>
+    <table id="swimmers">
+        <tr>
+            <th>Live ID</th>
+            <th>Start Date</th>
+            <th>Course</th>
+            <th>Name</th>
+            <th>City</th>
+        </tr>
+        {% if meets %}
+            {% for meet in meets %}
+                {% if meet.sw_live_id %}
+                    <tr>
+                        <td>
+                            <a href="https://live.swimrankings.net/{{ meet.sw_live_id }}" target="_blank" rel="noopener noreferrer">{{meet.sw_live_id}}</a>
+                        </td>
+                        <td> {{ meet.startdate }} </td>
+                        <td>
+                            {% if meet.sw_course == 2 %}
+                            <p>25m</p>
+                            {% else %}
+                            <p>50m</p>
+                            {% endif %}
+                        </td>
+                        <td> {{ meet.name }} </td>
+                        <td> {{ meet.city }} </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </table>
+</div>

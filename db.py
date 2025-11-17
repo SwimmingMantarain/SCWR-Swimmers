@@ -92,6 +92,19 @@ class ClubSwimmerPb(Base):
 
     athlete = relationship('ClubSwimmer', back_populates='pbs')
 
+class Meet(Base):
+    __tablename__ = 'meets'
+
+    id = Column(Integer, primary_key=True)
+    startdate = Column(Date, nullable=False)
+    enddate = Column(Date, nullable=False)
+    sw_live_id = Column(Integer, nullable=False)
+    sw_id = Column(Integer, nullable=False)
+    sw_course = Column(Integer, nullable=False)
+    last_updated = Column(DateTime, nullable=False)
+    name = Column(String, nullable=False)
+    city = Column(String, nullable=False)
+
 engine = create_engine(db_location_env)
 Base.metadata.create_all(engine)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

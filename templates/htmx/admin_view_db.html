@@ -5,7 +5,6 @@
 				<button hx-post="/v1/add-swimmer" hx-prompt="Swimmer's First, Last name (comma separated)" hx-target="#content" hx-swap="innerHTML swap:0.8s">Add Athlete</button>
 				<button hx-get="/admin/frag/remove-athlete-form" hx-target="#modal" hx-swap="innerHTML">Remove Athlete</button>
 				<button hx-get="/admin/frag/view-pb-form" hx-target="#modal" hx-swap="innerHTML">Swimmer Pbs</button>
-                <button hx-post="/admin/sync-db" hx-trigger="click">Sync Database</button>
 		</div>
 		<table id="swimmers">
 				<tr>

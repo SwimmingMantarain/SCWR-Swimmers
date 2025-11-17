@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from typing import Annotated, Union
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-from db import Token, ClubSwimmer, get_db
+from db import Token, ClubSwimmer, Meet, get_db
 from dotenv import load_dotenv
 from util import fmt_time, fmt_date
 from scraper import swimrankings_web, swimrankings_api
@@ -159,6 +159,42 @@ async def admin_view_db(
             return RedirectResponse(url="/admin", status_code=302)
 
 @router.get(
+    "/admin/view-meets",
+    response_class=HTMLResponse,
+    summary='Returns the view of the meets in the database',
+    description='What more can I say?'
+)
+async def admin_view_meets(
+    request: Request,
+    db: Session = Depends(get_db),
+    hx_request: Annotated[Union[str, None], Header()] = None
+):
+    token = request.cookies.get("access_token")
+
+    if hx_request:
+        if verify_token(token, db):
+            stmt = select(Meet)
+            meets = db.execute(stmt).scalars().all()
+            return templates.TemplateResponse(
+                request=request, name="htmx/admin_view_meets.html", context = {"meets": meets}
+            )
+        else:
+            response = templates.TemplateResponse(
+                request=request, name="htmx/admin_login.html"
+            )
+            response.headers["HX-Push-Url"] = "/admin"
+            return response
+    else:
+        if verify_token(token, db):
+            stmt = select(Meet)
+            meets = db.execute(stmt).scalars().all()
+            return templates.TemplateResponse(
+                request=request, name="admin/view_meets.html", context = {"meets": meets}
+            )
+        else:
+            return RedirectResponse(url="/admin", status_code=302)
+
+@router.get(
     "/admin/frag/remove-athlete-form",
     response_class=HTMLResponse,
     summary="Returns an html fragment for removing a swimmer from the db",
@@ -217,10 +253,10 @@ async def admin_frag_view_pb_form(
         return RedirectResponse(url="/admin", status_code=302)
 
 @router.post(
-    "/admin/sync-db",
+    "/admin/sync-meets",
     response_class=JSONResponse,
     summary="Triggers full db sync with swimmrankings",
-    description="W.I.P.",
+    description="Sure buddy",
 )
 async def admin_sync_db(
         request: Request,
@@ -231,10 +267,48 @@ async def admin_sync_db(
 
     if hx_request:
         if verify_token(token, db):
+            meets = []
             if sw_key: 
                 scraper = await swimrankings_api.get_scraper(sw_key)
-                await scraper.get_belgium_meets()
+                meets = await scraper.get_belgium_meets()
             else: 
                 scraper = swimrankings_web.get_scraper()
+
+            if meets:
+                for meet in meets:
+                    stmt = select(Meet).filter_by(name=meet.name, sw_live_id=meet.sw_live_id)
+                    db_meet = db.execute(stmt).scalar_one_or_none()
+                    print(db_meet)
+                    if not db_meet:
+                        new_meet = Meet(
+                            startdate=meet.startdate,
+                            enddate=meet.enddate,
+                            sw_live_id=meet.sw_live_id,
+                            sw_id=meet.sw_id,
+                            sw_course=meet.sw_course,
+                            last_updated=meet.last_updated,
+                            name=meet.name,
+                            city=meet.city,
+                        )
+
+                        db.add(new_meet)
+                        db.commit()
+                    elif db_meet.last_updated < meet.last_updated:
+                        db_meet.startdate = meet.startdate
+                        db_meet.enddate = meet.enddate
+                        db_meet.sw_live_id = meet.sw_live_id
+                        db_meet.sw_id = meet.sw_id
+                        db_meet.sw_course = meet.sw_course
+                        db_meet.last_updated = meet.last_updated
+                        db_meet.name = meet.name
+                        db_meet.city = meet.city
+                        db.commit()
+
+                stmt = select(Meet)
+                meets = db.execute(stmt).scalars().all()
+
+                return templates.TemplateResponse(
+                    request=request, name="htmx/admin_view_meets.html", context= {"meets": meets}
+                )
     else:
         return RedirectResponse(url="/admin", status_code=302)
