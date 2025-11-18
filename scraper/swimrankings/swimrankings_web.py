@@ -1,6 +1,6 @@
 from typing import AsyncGenerator
 from datetime import datetime, timezone, time
-from .base_scraper import BaseScraper, DataNotFoundError, HTMLParsingError
+from ..base_scraper import BaseScraper, DataNotFoundError, HTMLParsingError, ScraperUnimplementedError
 from .swimrankings_types import *
 import re
 
@@ -348,18 +348,20 @@ class SwimrankingsWebScraper(BaseScraper):
 
         pb_rows.pop(0) # Remove the headers
 
-
         pbs = self._parse_pb_table(pb_rows, fina_text)
 
         return pbs
 
-    async def fetch_club_athletes(self, clubid: int = 73626) -> list[Swimmer]:
+    async def get_belgium_meets(self) -> list[Meet]:
+        raise ScraperUnimplementedError();
+
+    async def get_club_athletes(self, clubid: int = 73626) -> list[Swimmer]:
         return await self._fetch_club_athletes(clubid)
 
-    async def fetch_athlete(self, full_name: str) -> Swimmer:
+    async def get_athlete(self, full_name: str) -> Swimmer:
         return await self._fetch_athlete(full_name)
 
-    async def fetch_athlete_personal_bests(self, athlete_id: int) -> list[SwimmerPb]:
+    async def get_athlete_personal_bests(self, athlete_id: int) -> list[SwimmerPb]:
         return await self._fetch_athlete_pbs(athlete_id)
 
 async def get_scraper() -> AsyncGenerator[SwimrankingsWebScraper, None]:

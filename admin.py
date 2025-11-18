@@ -9,9 +9,7 @@ from typing import Optional
 from db import Token, ClubSwimmer, Meet, get_db
 from dotenv import load_dotenv
 from util import fmt_time, fmt_date
-from scraper import swimrankings_web, swimrankings_api
-from scraper.swimrankings_web import SwimrankingsWebScraper
-from scraper.swimrankings_api import SwimrankingsApiScraper
+from scraper.swimrankings import SwimrankingsScraper
 import bcrypt
 import secrets
 import os
@@ -267,12 +265,8 @@ async def admin_sync_db(
 
     if hx_request:
         if verify_token(token, db):
-            meets = []
-            if sw_key: 
-                scraper = await swimrankings_api.get_scraper(sw_key)
-                meets = await scraper.get_belgium_meets()
-            else: 
-                scraper = swimrankings_web.get_scraper()
+            scraper = SwimrankingsScraper()
+            meets = await scraper.get_belgium_meets()
 
             if meets:
                 for meet in meets:

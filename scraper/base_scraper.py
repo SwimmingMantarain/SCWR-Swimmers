@@ -7,6 +7,9 @@ import time
 class ScraperError(Exception):
     """Generic class for scraping related errors"""
 
+class ScraperUnimplementedError(ScraperError):
+    """This scraper function is unimplemented"""
+
 class ScrapingError(ScraperError):
     """Failed to scrape and obtain html."""
 

@@ -1,4 +1,4 @@
-from .base_scraper import BaseScraper, ScraperError
+from ..base_scraper import BaseScraper, ScraperError, ScraperUnimplementedError
 from .swimrankings_types import *
 from datetime import datetime
 
@@ -37,6 +37,15 @@ class SwimrankingsApiScraper(BaseScraper):
                     ))
 
         return meets
+
+    async def get_club_athletes(self, clubid: int = 73626) -> list[Swimmer]:
+        raise ScraperUnimplementedError()
+
+    async def get_athlete(self, full_name: str) -> Swimmer:
+        raise ScraperUnimplementedError()
+
+    async def get_athlete_personal_bests(self, athlete_id: int) -> list[SwimmerPb]:
+        raise ScraperUnimplementedError()
 
 async def get_scraper(api_key: str = "") -> SwimrankingsApiScraper:
     scraper = SwimrankingsApiScraper(api_key)
