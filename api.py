@@ -306,12 +306,14 @@ async def api_athlete_pb_table(
     description="TODO: WIP"
 )
 async def api_athletes_endpoint(
-    request: Request,
     db: Session = Depends(get_db),
-    x_api_key: str = Header(None),
+    x_api_key: str = Header(...),
 ):
-    if x_api_key != api_key:
-        return {"message" : "¯\\_(ツ)_/¯"}
+    if not verify_api_key(x_api_key):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid API Key ¯\\_(ツ)_/¯"
+        )
 
     stmt = select(ClubSwimmer)
     swimmers = db.execute(stmt).scalars().all()
@@ -325,16 +327,23 @@ async def api_athletes_endpoint(
     description="TODO: WIP"
 )
 async def api_athlete_endpoint(
-        request: Request,
         id: int,
         db: Session = Depends(get_db),
-        x_api_key: str = Header(None),
+        x_api_key: str = Header(...),
 ):
-    if x_api_key != api_key:
-        return {"message" : "¯\\_(ツ)_/¯"}
+    if not verify_api_key(x_api_key):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid API Key ¯\\_(ツ)_/¯"
+        )
 
     stmt = select(ClubSwimmer).filter_by(id=id)
     athlete = db.execute(stmt).scalar_one_or_none()
+    if athlete is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Athlete not found in database"
+        )
 
     stmt = select(ClubSwimmerPb).filter_by(athlete_id=athlete.id)
     athlete_pbs = db.execute(stmt).scalars().all()

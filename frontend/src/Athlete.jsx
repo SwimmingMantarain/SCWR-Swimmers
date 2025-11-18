@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
+const api_base_url = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
 const formatTime = (timeStr) => {
   if (!timeStr) return '--:--:--';
   
@@ -178,7 +180,7 @@ function Athlete() {
     useEffect(() => {
         async function fetchAthletes() {
             try {
-                const response = await axios.get(`http://localhost:8000/v1/athlete?id=${id}`, {
+                const response = await axios.get(`${api_base_url}/v1/athlete?id=${id}`, {
                     headers: { 'x-api-key': api_key },
                 });
                 const { athlete, pbs } = response.data;
