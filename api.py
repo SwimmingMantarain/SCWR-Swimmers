@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Header, Security, HTTPException, status, Depends, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.security.api_key import APIKeyCookie
 from sqlalchemy.orm import Session
@@ -11,10 +11,17 @@ from admin import verify_token
 from scraper import swimrankings
 from scraper.swimrankings import SwimrankingsScraper
 from util import fmt_time, fmt_date
+from dotenv import load_dotenv
+import os
 
-api_key_cookie = APIKeyCookie(name="access_token")
+admin_key_cookie = APIKeyCookie(name="access_token")
 
-def get_api_key(db: Session = Depends(get_db), api_key: str = Security(api_key_cookie)):
+load_dotenv()
+api_key = os.getenv("APIKEY")
+if not api_key:
+    raise RuntimeError("APIKEY (secrets.url_safe) not set in .env file!!!\n")
+
+def get_admin_key(db: Session = Depends(get_db), admin_key: str = Security(admin_key_cookie)):
     """
     Checks whether user has valid credentials
 
@@ -29,16 +36,29 @@ def get_api_key(db: Session = Depends(get_db), api_key: str = Security(api_key_c
         str: The api key
 
     Raises:
-        HTTPException: If `api_key` isn't valid
+        HTTPException: If `admin_key` isn't valid
     """
-    if not verify_token(api_key, db):
+    if not verify_token(admin_key, db):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
-    return api_key
+    return admin_key
 
-router = APIRouter(prefix="/v1", dependencies=[Depends(get_api_key)])
+def verify_api_key(key: str):
+    """
+    Verifies if an API key exists or is valid
+
+    Args:
+        api_key (str): Unique identifier of the API Key
+
+    Returns:
+        bool: Whether or not the API key is valid
+    """
+    return key == api_key
+
+
+router = APIRouter(prefix="/v1")
 templates = Jinja2Templates(directory="templates")
 
 templates.env.filters["fmt_time"] = fmt_time
@@ -193,7 +213,7 @@ async def api_sync_swimmers(
 
                     db.add(swimmer)
                     db.commit()
-            
+
             # wish there was a cleaner way of doing this
             sw_ids = []
             for swimmer in swimmers:
@@ -277,3 +297,55 @@ async def api_athlete_pb_table(
             return HTMLResponse(
                 '<script>window.location.href="https://youtu.be/dQw4w9WgXcQ?si=JPPysw3QXTLBs71z"; window.location.reload()</script>'
             )
+
+
+@router.get(
+    "/athletes",
+    response_class=JSONResponse,
+    summary="Returns json data of athletes in the database",
+    description="TODO: WIP"
+)
+async def api_athletes_endpoint(
+    db: Session = Depends(get_db),
+    x_api_key: str = Header(...),
+):
+    if not verify_api_key(x_api_key):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid API Key ¯\\_(ツ)_/¯"
+        )
+
+    stmt = select(ClubSwimmer)
+    swimmers = db.execute(stmt).scalars().all()
+
+    return swimmers
+
+@router.get(
+    "/athlete",
+    response_class=JSONResponse,
+    summary="Returns json data for specific athlete",
+    description="TODO: WIP"
+)
+async def api_athlete_endpoint(
+        id: int,
+        db: Session = Depends(get_db),
+        x_api_key: str = Header(...),
+):
+    if not verify_api_key(x_api_key):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid API Key ¯\\_(ツ)_/¯"
+        )
+
+    stmt = select(ClubSwimmer).filter_by(id=id)
+    athlete = db.execute(stmt).scalar_one_or_none()
+    if athlete is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Athlete not found in database"
+        )
+
+    stmt = select(ClubSwimmerPb).filter_by(athlete_id=athlete.id)
+    athlete_pbs = db.execute(stmt).scalars().all()
+
+    return {"athlete": athlete, "pbs": athlete_pbs}

@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pages import router as pages_router
 from api import router as api_router
 from admin import router as admin_router
@@ -14,3 +15,12 @@ app.include_router(pages_router)
 app.include_router(api_router)
 app.include_router(admin_router)
 app.include_router(htmx_router)
+
+# Frontend exception
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)

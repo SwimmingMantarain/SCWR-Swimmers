@@ -1,0 +1,131 @@
+#header-logo {
+    width: 25%;
+    height: auto;
+    margin: 0;
+    cursor: pointer;
+    user-select: none;
+}
+
+#header-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+header {
+    padding: 8px 4px 0px 4px;
+    border-bottom: 2px solid #83B1D5;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+div.photo-card {
+    width: 70%;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    border: 2px solid #83B1D5;
+    border-radius: 10px;
+    overflow: hidden;
+    user-select: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+}
+
+img.photo-card-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+div.card-label-wrapper {
+    position: absolute;
+    top: 2.5%;
+    left: 50%;
+    transform: translateX(-50%) scale(1);
+    z-index: 10;
+    backdrop-filter: blur(5px);
+    background: rgba(56, 138, 201, 0.25);
+    color: #F9CE4E;
+    font-family: 'Quotes', sans-serif;
+    padding: 6px 8px;
+    border-radius: 7px;
+    transform-origin: center center;
+    will-change: transform;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        top 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+span#card-label {
+    font-size: 150%;
+}
+
+div.photo-card:hover .card-label-wrapper,
+div.photo-card:focus .card-label-wrapper {
+    top: 50%;
+    transform: translate(-50%, -50%) scale(4);
+}
+
+div#content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px;
+    gap: 20px;
+    flex: 1;
+    max-width: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+div#bottom-row {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    width: 100%;
+    justify-content: center;
+    flex: 1;
+    min-height: 0;
+}
+
+div#card-center {
+    flex: 1;
+    width: 100%;
+    max-width: 50%;
+    min-height: 0;
+}
+
+div#bottom-row .photo-card {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+}
+
+#root {
+    width: 100%;
+    height: 100vh;
+    padding: 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+body {
+    min-height: 100vh;
+    height: 100vh;
+    background-color: #112330;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+h1 {
+    margin: 0;
+}
+
+* {
+    box-sizing: border-box;
+}

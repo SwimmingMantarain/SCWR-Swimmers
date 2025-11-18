@@ -26,7 +26,6 @@ class Token(Base):
     token = Column(String, nullable=False)
     expiry = Column(DateTime(timezone=True), nullable=False)
 
-
 class ClubSwimmer(Base):
     """
     Stores primary swimmer data for use in `/athletes` & `/athlete?id=?` endpoints.
