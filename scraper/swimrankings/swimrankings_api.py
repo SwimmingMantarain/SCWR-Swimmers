@@ -44,7 +44,7 @@ class SwimrankingsApiScraper(BaseScraper):
     async def get_athlete(self, full_name: str) -> Swimmer:
         raise ScraperUnimplementedError()
 
-    async def get_athlete_personal_bests(self, athlete_id: int) -> list[SwimmerPb]:
+    async def get_athlete_pbs(self, athlete_id: int) -> list[SwimmerPb]:
         raise ScraperUnimplementedError()
 
 async def get_scraper(api_key: str = "") -> SwimrankingsApiScraper:

@@ -266,6 +266,7 @@ async def admin_sync_db(
     if hx_request:
         if verify_token(token, db):
             scraper = SwimrankingsScraper()
+            await scraper.init()
             meets = await scraper.get_belgium_meets()
 
             if meets:

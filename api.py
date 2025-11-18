@@ -8,9 +8,7 @@ from typing import Union, Annotated
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 from db import ClubSwimmer, ClubSwimmerPb, get_db
 from admin import verify_token
-from scraper import swimrankings_web, swimrankings_api
-from scraper.swimrankings_web import SwimrankingsWebScraper
-from scraper.swimrankings_api import SwimrankingsApiScraper
+from scraper.swimrankings import SwimrankingsScraper
 from util import fmt_time, fmt_date
 from dotenv import load_dotenv
 import os
@@ -74,19 +72,19 @@ templates.env.filters["fmt_date"] = fmt_date
 async def api_add_swimmer(
     request: Request,
     db: Session = Depends(get_db),
-    scraper: SwimrankingsWebScraper = Depends(swimrankings_web.get_scraper),
     full_name: Annotated[Union[str, None], Header(alias="HX-Prompt")] = None,
     hx_request: Annotated[Union[str, None], Header(alias="HX-Request")] = None
 ):
     if hx_request:
         swimmer = None
+        scraper = SwimrankingsScraper()
         try:
             if not full_name:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="No name provided"
                 )
-            swimmer = await scraper.fetch_athlete(str(full_name))
+            swimmer = await scraper.get_athlete(str(full_name))
         except RuntimeError as e:
             print(e)
             raise HTTPException(
@@ -108,7 +106,7 @@ async def api_add_swimmer(
             stmt = select(ClubSwimmer)
             swimmers = db.execute(stmt).scalars().all()
 
-            pbs = await scraper.fetch_athlete_personal_bests(swimmer.sw_id)
+            pbs = await scraper.get_athlete_pbs(swimmer.sw_id)
 
             for pb in pbs:
                 scraped_pb = ClubSwimmerPb(
@@ -187,12 +185,12 @@ async def api_remove_athlete(
 async def api_sync_swimmers(
     request: Request,
     db: Session = Depends(get_db),
-    scraper: SwimrankingsWebScraper = Depends(swimrankings_web.get_scraper),
     hx_request: Annotated[Union[str, None], Header()] = None
 ):
     if hx_request:
+        scraper = SwimrankingsScraper()
         try:
-            swimmers = await scraper.fetch_club_athletes()
+            swimmers = await scraper.get_club_athletes()
         except RuntimeError as e:
             print(e)
             raise HTTPException(
@@ -228,7 +226,7 @@ async def api_sync_swimmers(
             swimmers = db.execute(stmt).scalars().all()
 
             for swimmer in swimmers:
-                pbs = await scraper.fetch_athlete_personal_bests(swimmer.sw_id)
+                pbs = await scraper.get_athlete_pbs(swimmer.sw_id)
 
                 for pb in pbs:
                     scraped_pb = ClubSwimmerPb(

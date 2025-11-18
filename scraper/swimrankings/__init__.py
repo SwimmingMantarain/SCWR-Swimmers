@@ -5,8 +5,10 @@ from .swimrankings_types import *
 class SwimrankingsScraper:
     def __init__(self, key: str = ""):
         self.key = key
-        self._api_instance = get_api_scraper(key)
-        self._web_instance = get_web_scraper()
+
+    async def init(self):
+        self._api_instance = await get_api_scraper(self.key)
+        self._web_instance = await get_web_scraper()
 
     async def get_club_athletes(self, clubid: int = 73626) -> list[Swimmer]:
         athletes = []

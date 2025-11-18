@@ -25,6 +25,9 @@ class UrlBook:
                 f'&season=2025&course=LCM&agegroup=0&stroke=9'
         )
 
+    def live_meets(self):
+        return 'https://live.swimrankings.net'
+
 class SwimrankingsWebScraper(BaseScraper):
     def __init__(self):
         super().__init__(UrlBook())
@@ -352,8 +355,11 @@ class SwimrankingsWebScraper(BaseScraper):
 
         return pbs
 
+    async def _fetch_belgium_meets(self) -> list[Meet]:
+        return []
+
     async def get_belgium_meets(self) -> list[Meet]:
-        raise ScraperUnimplementedError();
+        return await self._fetch_belgium_meets()
 
     async def get_club_athletes(self, clubid: int = 73626) -> list[Swimmer]:
         return await self._fetch_club_athletes(clubid)
@@ -361,9 +367,10 @@ class SwimrankingsWebScraper(BaseScraper):
     async def get_athlete(self, full_name: str) -> Swimmer:
         return await self._fetch_athlete(full_name)
 
-    async def get_athlete_personal_bests(self, athlete_id: int) -> list[SwimmerPb]:
+    async def get_athlete_pbs(self, athlete_id: int) -> list[SwimmerPb]:
         return await self._fetch_athlete_pbs(athlete_id)
 
-async def get_scraper() -> AsyncGenerator[SwimrankingsWebScraper, None]:
-    async with SwimrankingsWebScraper() as scraper:
-        yield scraper
+async def get_scraper() -> SwimrankingsWebScraper:
+    scraper = SwimrankingsWebScraper()
+    await scraper.__aenter__()
+    return scraper
