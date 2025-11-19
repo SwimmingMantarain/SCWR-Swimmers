@@ -33,6 +33,7 @@ function Athletes() {
     const navigate = useNavigate();
 
     const api_key = import.meta.env.VITE_APIKEY;
+    const backend_url = import.meta.env.VITE_BACKEND_URL;
 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -41,7 +42,7 @@ function Athletes() {
     useEffect(() => {
         async function fetchAthletes() {
             try {
-                const response = await axios.get("http://localhost:8000/v1/athletes", {
+                const response = await axios.get(`${backend_url}/v1/athletes`, {
                     headers: { 'x-api-key': api_key },
                 });
                 setData(response.data);
