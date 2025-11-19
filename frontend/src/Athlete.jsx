@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
-const api_base_url = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const api_base_url = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 
 const formatTime = (timeStr) => {
   if (!timeStr) return '--:--:--';
